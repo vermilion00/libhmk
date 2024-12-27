@@ -21,7 +21,6 @@
 #include "hid.h"
 #include "layout.h"
 #include "switches.h"
-#include "timer.h"
 #include "tusb.h"
 #include "user_config.h"
 
