@@ -225,11 +225,13 @@ void layout_post_hid_report_event_push(uint16_t index, uint8_t keycode,
  * @brief Process single post-HID report event
  *
  * @param event The event to process
+ * @param allow_push Whether to allow pushing more events to the queue during
+ * the processing
  *
  * @return none
  */
 void layout_process_post_hid_report_event(
-    const layout_post_hid_report_event_t *event);
+    const layout_post_hid_report_event_t *event, bool allow_push);
 
 /**
  * @brief Process all the events in the post-HID report event queue and clear

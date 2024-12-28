@@ -128,10 +128,12 @@ void layout_event_init(void) {
 }
 
 void layout_event_push(uint16_t index, uint8_t sw_state) {
-    if (num_pending_events == MAX_PENDING_EVENTS)
+    if (num_pending_events == MAX_PENDING_EVENTS) {
         // The event queue is full
         pending_event_head =
             (pending_event_head + 1) & (MAX_PENDING_EVENTS - 1);
+        num_pending_events--;
+    }
 
     const uint32_t pending_event_tail =
         (pending_event_head + num_pending_events) & (MAX_PENDING_EVENTS - 1);
@@ -256,7 +258,8 @@ void layout_process_events(void) {
                 user_config_set_current_profile(
                     SP_PROFILE_TO_GET_PROFILE(keycode));
             } else if (IS_DKS_KEYCODE(keycode)) {
-                layout_process_dks(i, DKS_GET_CONFIG(keycode), event->sw_state,
+                layout_process_dks(event->index, DKS_GET_CONFIG(keycode),
+                                   event->sw_state,
                                    last_sw_states[event->index]);
             } else if (IS_MAGIC_KEYCODE(keycode)) {
                 layout_process_magic_keycode(keycode);
@@ -289,7 +292,8 @@ void layout_process_events(void) {
             } else if (IS_PROFILE_TO_KEYCODE(keycode)) {
                 // Nothing to do
             } else if (IS_DKS_KEYCODE(keycode)) {
-                layout_process_dks(i, DKS_GET_CONFIG(keycode), event->sw_state,
+                layout_process_dks(event->index, DKS_GET_CONFIG(keycode),
+                                   event->sw_state,
                                    last_sw_states[event->index]);
             } else if (IS_MAGIC_KEYCODE(keycode)) {
                 // Nothing to do
@@ -297,9 +301,11 @@ void layout_process_events(void) {
         } else {
             uint16_t keycode = active_keycodes[event->index];
 
-            if (IS_DKS_KEYCODE(keycode))
-                layout_process_dks(i, DKS_GET_CONFIG(keycode), event->sw_state,
+            if (IS_DKS_KEYCODE(keycode)) {
+                layout_process_dks(event->index, DKS_GET_CONFIG(keycode),
+                                   event->sw_state,
                                    last_sw_states[event->index]);
+            }
         }
 
         // Update the last switch state
@@ -445,10 +451,12 @@ void layout_post_hid_report_event_push(uint16_t index, uint8_t keycode,
                                        uint8_t action) {
     if (num_post_hid_report_events == MAX_POST_HID_REPORT_EVENTS) {
         // If the event queue is full, we should execute the oldest event now.
+        // We also do not allow pushing more events to the queue at this point.
         layout_process_post_hid_report_event(
-            &post_hid_report_events[post_hid_report_event_head]);
+            &post_hid_report_events[post_hid_report_event_head], false);
         post_hid_report_event_head =
             (post_hid_report_event_head + 1) & (MAX_POST_HID_REPORT_EVENTS - 1);
+        num_post_hid_report_events--;
     }
 
     const uint32_t post_hid_report_event_tail =
@@ -461,7 +469,7 @@ void layout_post_hid_report_event_push(uint16_t index, uint8_t keycode,
 }
 
 void layout_process_post_hid_report_event(
-    const layout_post_hid_report_event_t *event) {
+    const layout_post_hid_report_event_t *event, bool allow_push) {
     switch (event->action) {
     case POST_HID_REPORT_ACTION_ADD:
         hid_add_keycode(event->keycode);
@@ -472,7 +480,9 @@ void layout_process_post_hid_report_event(
         break;
 
     case POST_HID_REPORT_ACTION_TAP:
-        layout_process_tap_action(event->index, event->keycode);
+        if (allow_push)
+            // Tap action will add release event to the queue.
+            layout_process_tap_action(event->index, event->keycode);
         break;
 
     default:
@@ -481,12 +491,26 @@ void layout_process_post_hid_report_event(
 }
 
 void layout_process_post_hid_report_events(void) {
-    for (uint32_t i = 0; i < num_post_hid_report_events; i++)
-        layout_process_post_hid_report_event(
-            &post_hid_report_events[(post_hid_report_event_head + i) &
-                                    (MAX_PENDING_EVENTS - 1)]);
+    static layout_post_hid_report_event_t buffer[MAX_PENDING_EVENTS];
+
+    if (num_post_hid_report_events == 0)
+        return;
+
+    // Copy the events to a temporary buffer to avoid pushing new events while
+    // we are clearing the queue
+    const uint32_t head = post_hid_report_event_head;
+    const uint32_t len = num_post_hid_report_events;
+
+    for (uint32_t i = 0; i < len; i++)
+        buffer[i] =
+            post_hid_report_events[(head + i) & (MAX_PENDING_EVENTS - 1)];
 
     // Clear the event queue
     post_hid_report_event_head = 0;
     num_post_hid_report_events = 0;
+
+    for (uint32_t i = 0; i < len; i++)
+        // We have already cleared the event queue, so we can allow pushing more
+        // events.
+        layout_process_post_hid_report_event(&buffer[i], true);
 }
