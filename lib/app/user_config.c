@@ -59,7 +59,7 @@ void user_config_init(void) {
 
 void user_config_reset(void) {
     eeprom_erase();
-    memcpy(&user_config, &default_user_config, sizeof(user_config_t));
+    user_config = default_user_config;
     user_config_save_crc32();
     // Save the rest of the user configuration
     eeprom_write(4, (uint8_t *)&user_config + 4, sizeof(user_config_t) - 4);

@@ -419,8 +419,7 @@ void layout_tick_event(void) {
 
         if (!should_pop) {
             if (free_stack_slot != i)
-                memcpy(&tap_hold_events[free_stack_slot], event,
-                       sizeof(layout_tap_hold_event_t));
+                tap_hold_events[free_stack_slot] = *event;
             free_stack_slot++;
         }
     }

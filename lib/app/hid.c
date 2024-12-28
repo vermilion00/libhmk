@@ -142,7 +142,7 @@ static bool hid_send_report(uint8_t starting_report_id) {
                 // The report has not changed
                 break;
 
-            memcpy(&prev_kb_report, &kb_report, sizeof(kb_report));
+            prev_kb_report = kb_report;
             tud_hid_report(REPORT_ID_KEYBOARD, &kb_report, sizeof(kb_report));
             return true;
 
