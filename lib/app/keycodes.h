@@ -289,6 +289,7 @@ enum {
     SP_MAGIC_BOOTLOADER = 0x7000,
     SP_MAGIC_REBOOT = 0x7001,
     SP_MAGIC_FACTORY_RESET = 0x7002,
+    SP_MAGIC_RECALIBRATE = 0x7003,
 
     // Aliases
     XXXXXXX = KC_NO,
@@ -460,7 +461,7 @@ enum {
 #define IS_DKS_KEYCODE(keycode) (SP_DKS <= (keycode) && (keycode) <= SP_DKS_MAX)
 
 #define IS_MAGIC_KEYCODE(keycode)                                              \
-    (SP_MAGIC_BOOTLOADER <= (keycode) && (keycode) <= SP_MAGIC_FACTORY_RESET)
+    (SP_MAGIC_BOOTLOADER <= (keycode) && (keycode) <= SP_MAGIC_RECALIBRATE)
 
 //--------------------------------------------------------------------+
 // Modifier-Mask Macros

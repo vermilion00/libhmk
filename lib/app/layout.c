@@ -214,6 +214,10 @@ void layout_process_magic_keycode(uint16_t keycode) {
         user_config_reset();
         break;
 
+    case SP_MAGIC_RECALIBRATE:
+        switch_recalibrate();
+        break;
+
     default:
         break;
     }

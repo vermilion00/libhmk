@@ -143,6 +143,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 #define MGC_BTL SP_MAGIC_BOOTLOADER
 #define MGC_RBT SP_MAGIC_REBOOT
 #define MGC_FAC SP_MAGIC_FACTORY_RESET
+#define MGC_REC SP_MAGIC_RECALIBRATE
 #define DEFAULT_KEYMAP                                                         \
     {                                                                          \
         {                                                                      \
@@ -164,7 +165,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
             _______, _______, _______, _______, _______, _______, _______,     \
             _______, _______, _______, _______, _______, _______, _______,     \
             _______, _______, _______, _______, _______, _______, _______,     \
-            _______, MGC_BTL, MGC_RBT, MGC_FAC, _______, _______, _______,     \
+            _______, MGC_BTL, MGC_RBT, MGC_FAC, MGC_REC, _______, _______,     \
             _______, _______, _______, _______, _______, _______, _______,     \
             _______, _______, _______, _______, _______, _______, _______,     \
             _______,                                                           \

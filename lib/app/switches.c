@@ -73,6 +73,11 @@ void wait_for_switch_calibration(void) {
         ;
 }
 
+void switch_recalibrate(void) {
+    // We simply re-initialize the switches to restart the calibration.
+    switch_init();
+}
+
 void store_adc_value(uint16_t index, uint16_t adc_value) {
     if (index >= NUM_KEYS)
         return;

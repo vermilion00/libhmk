@@ -156,6 +156,13 @@ uint16_t calibration_initial_min(uint8_t sw_id);
 uint16_t calibration_delta(uint8_t sw_id);
 
 /**
+ * @brief Recalibrate the switches
+ *
+ * @return none
+ */
+void switch_recalibrate(void);
+
+/**
  * @brief Store the ADC value of the switch
  *
  * This function should be called by the ADC module whenever a new ADC value is
