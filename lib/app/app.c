@@ -31,7 +31,6 @@ void app_init(void) {
     switch_init();
     hid_init();
     layout_init();
-    adc_init();
 
     wait_for_switch_calibration();
 

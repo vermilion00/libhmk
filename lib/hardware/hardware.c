@@ -15,11 +15,13 @@
 
 #include "hardware.h"
 
+#include "adc.h"
 #include "debug.h"
 #include "eeprom.h"
 #include "timer.h"
 
 void hardware_init(void) {
+    adc_init();
     debug_init();
     eeprom_init();
     timer_init();
