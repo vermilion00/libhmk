@@ -29,6 +29,7 @@
 #define USB_WEBUSB_URL_SCHEME 1
 #endif
 
+#if defined(ENABLE_WEB_CONFIGURATOR)
 #if !defined(VENDOR_BUFFER_SIZE)
 // The size of the vendor request buffer. Must be large enough to hold the
 // largest vendor class request.
@@ -37,6 +38,7 @@
 
 // Version of the vendor class protocol
 #define VENDOR_CLASS_PROTOCOL_VERSION 0x0100
+#endif
 
 //--------------------------------------------------------------------+
 // USB Vendor Class Requests
@@ -50,12 +52,12 @@ enum {
     CLASS_REQUEST_FACTORY_RESET,
     CLASS_REQUEST_RECALIBRATE,
     CLASS_REQUEST_SWITCH_DEBUG,
+    CLASS_REQUEST_KEYMAP,
 };
 
 enum {
     CLASS_REQUEST_INDEX_GET = 0,
     CLASS_REQUEST_INDEX_SET,
-    CLASS_REQUEST_INDEX_RESET,
 };
 
 //--------------------------------------------------------------------+
@@ -74,3 +76,14 @@ typedef struct __attribute__((packed)) {
     uint16_t adc_values[NUM_KEYS];
     uint8_t distances[NUM_KEYS];
 } class_res_switch_debug_t;
+
+typedef struct __attribute__((packed)) {
+    uint16_t keymap[NUM_PROFILES][NUM_LAYERS][NUM_KEYS];
+} class_res_keymap_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t profile;
+    uint8_t layer;
+    uint16_t index;
+    uint16_t keycode;
+} class_req_keymap_t;

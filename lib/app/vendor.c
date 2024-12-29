@@ -26,7 +26,9 @@
 // TinyUSB Vendor Callbacks
 //--------------------------------------------------------------------+
 
+#if defined(ENABLE_WEB_CONFIGURATOR)
 static uint8_t request_buffer[VENDOR_REQUEST_BUFFER_SIZE];
+#endif
 
 #if defined(USB_WEBUSB_URL)
 // WebUSB landing page URL
@@ -85,6 +87,7 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
 
         break;
 
+#if defined(ENABLE_WEB_CONFIGURATOR)
     case TUSB_REQ_TYPE_CLASS:
         switch (request->bRequest) {
         case CLASS_REQUEST_PROTOCOL_VERSION:
@@ -167,10 +170,60 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
             // Nothing to do for DATA & ACK stages
             return true;
 
+        case CLASS_REQUEST_KEYMAP:
+            switch (request->wValue) {
+            case CLASS_REQUEST_INDEX_GET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    if (request->wLength < sizeof(class_res_keymap_t))
+                        // Invalid response length
+                        return false;
+
+                    static class_res_keymap_t res;
+                    for (uint32_t i = 0; i < NUM_PROFILES; i++)
+                        for (uint32_t j = 0; j < NUM_LAYERS; j++)
+                            for (uint32_t k = 0; k < NUM_KEYS; k++)
+                                res.keymap[i][j][k] =
+                                    user_config_keymap(i, j, k);
+
+                    return tud_control_xfer(rhport, request, &res, sizeof(res));
+                }
+                // Nothing to do for DATA & ACK stages
+                return true;
+
+            case CLASS_REQUEST_INDEX_SET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    if (request->wLength % sizeof(class_req_keymap_t) != 0 ||
+                        request->wLength > VENDOR_REQUEST_BUFFER_SIZE)
+                        // Invalid request length
+                        return false;
+
+                    return tud_control_xfer(rhport, request, request_buffer,
+                                            request->wLength);
+                } else if (stage == CONTROL_STAGE_DATA) {
+                    const uint32_t num_reqs =
+                        request->wLength / sizeof(class_req_keymap_t);
+                    const class_req_keymap_t *reqs =
+                        (class_req_keymap_t *)request_buffer;
+
+                    for (uint32_t i = 0; i < num_reqs; i++)
+                        user_config_set_keymap(reqs[i].profile, reqs[i].layer,
+                                               reqs[i].index, reqs[i].keycode);
+
+                    return true;
+                }
+                // Nothing to do for ACK stage
+                return true;
+
+            default:
+                break;
+            }
+            break;
+
         default:
             break;
         }
         break;
+#endif
 
     default:
         break;

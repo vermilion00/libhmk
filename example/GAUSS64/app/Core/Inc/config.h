@@ -52,6 +52,7 @@ clang-format on */
 #define NUM_PROFILES 4
 #define NUM_LAYERS 4
 // #define ENABLE_BOOTLOADER
+#define ENABLE_WEB_CONFIGURATOR
 
 //--------------------------------------------------------------------+
 // Hardware Configuration

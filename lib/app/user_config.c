@@ -73,6 +73,9 @@ uint8_t user_config_current_profile(void) {
 }
 
 void user_config_set_current_profile(uint8_t profile) {
+    if (profile >= NUM_PROFILES)
+        return;
+
     user_config.current_profile = profile;
     user_config_save_crc32();
     eeprom_write(offsetof(user_config_t, current_profile),
@@ -86,6 +89,21 @@ key_config_t *user_config_key_config(uint8_t profile, uint16_t index) {
 
 uint16_t user_config_keymap(uint8_t profile, uint8_t layer, uint16_t index) {
     return user_config.keymap[profile][layer][index];
+}
+
+void user_config_set_keymap(uint8_t profile, uint8_t layer, uint16_t index,
+                            uint16_t keymap) {
+    if (profile >= NUM_PROFILES || layer >= NUM_LAYERS || index >= NUM_KEYS)
+        return;
+
+    user_config.keymap[profile][layer][index] = keymap;
+    user_config_save_crc32();
+    eeprom_write(
+        offsetof(user_config_t, keymap) +
+            sizeof(user_config.keymap[0][0][0]) *
+                (profile * NUM_LAYERS * NUM_KEYS + layer * NUM_KEYS + index),
+        (uint8_t *)&user_config.keymap[profile][layer][index],
+        sizeof(user_config.keymap[0][0][0]));
 }
 
 dynamic_keystroke_config_t *

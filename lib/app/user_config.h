@@ -201,6 +201,19 @@ key_config_t *user_config_key_config(uint8_t profile, uint16_t index);
 uint16_t user_config_keymap(uint8_t profile, uint8_t layer, uint16_t index);
 
 /**
+ * @brief Set the keymap in the user configuration
+ *
+ * @param profile The profile
+ * @param layer The layer
+ * @param index The key index
+ * @param keycode The keycode
+ *
+ * @return none
+ */
+void user_config_set_keymap(uint8_t profile, uint8_t layer, uint16_t index,
+                            uint16_t keycode);
+
+/**
  * @brief Get the dynamic keystroke configuration from the user configuration
  *
  * @param index The dynamic keystroke index
