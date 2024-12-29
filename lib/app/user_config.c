@@ -45,15 +45,14 @@ static inline void user_config_save_crc32(void) {
 }
 
 void user_config_init(void) {
+    // TODO: Handle version migration
+
     // Load the user configuration from EEPROM
     eeprom_read(0, (uint8_t *)&user_config, sizeof(user_config_t));
 
     // Verify the user configuration
     if (user_config.crc32 != user_config_crc32())
         // The user configuration is invalid, reset it to the default
-        user_config_reset();
-    else if (user_config.version != USER_CONFIG_VERSION)
-        // TODO: Handle version migration
         user_config_reset();
 }
 
