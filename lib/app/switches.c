@@ -301,6 +301,20 @@ void matrix_scan(void) {
     }
 }
 
+uint16_t get_switch_adc_value(uint16_t index) {
+    if (index >= NUM_KEYS)
+        return 0;
+
+    return switches[index].adc_state.adc_value;
+}
+
+uint8_t get_switch_distance(uint16_t index) {
+    if (index >= NUM_KEYS)
+        return 0;
+
+    return switches[index].distance;
+}
+
 uint8_t get_switch_state(uint16_t index) {
     if (index >= NUM_KEYS)
         return 0;

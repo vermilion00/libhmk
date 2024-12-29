@@ -203,6 +203,24 @@ uint8_t adc_state_to_distance(const adc_state_t *adc_state, uint8_t sw_id,
 void matrix_scan(void);
 
 /**
+ * @brief Get the ADC value of the switch
+ *
+ * @param index The index of the switch
+ *
+ * @return The ADC value of the switch
+ */
+uint16_t get_switch_adc_value(uint16_t index);
+
+/**
+ * @brief Get the switch distance
+ *
+ * @param index The index of the switch
+ *
+ * @return The switch distance
+ */
+uint8_t get_switch_distance(uint16_t index);
+
+/**
  * @brief Get the switch state
  *
  * @param index The index of the switch
