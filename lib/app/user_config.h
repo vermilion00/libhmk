@@ -101,6 +101,7 @@ enum {
     // Hold action is triggered either after the tapping term or when another
     // key is pressed.
     TAP_HOLD_HOLD_ON_OTHER_KEY_PRESS,
+    TAP_HOLD_COUNT,
 };
 
 // Used for representing all possible configurations of a single key dynamic
@@ -136,7 +137,10 @@ typedef struct __attribute__((packed)) {
 
     // Key configurations. Each profile is applied throughout all layers.
     key_config_t key_config[NUM_PROFILES][NUM_KEYS];
+    // Keymap for each profile and layer
     uint16_t keymap[NUM_PROFILES][NUM_LAYERS][NUM_KEYS];
+    // Dynamic keystroke configurations. Each profile has its own set of dynamic
+    // keystroke configurations.
     dynamic_keystroke_config_t
         dynamic_keystroke_config[NUM_PROFILES][NUM_DYNAMIC_KEYSTROKE_CONFIGS];
 } user_config_t;
@@ -170,11 +174,29 @@ void user_config_reset(void);
 uint8_t user_config_sw_id(void);
 
 /**
+ * @brief Set the switch ID in the user configuration
+ *
+ * @param sw_id The switch ID
+ *
+ * @return none
+ */
+void user_config_set_sw_id(uint8_t sw_id);
+
+/**
  * @brief Get the tap-hold configuration from the user configuration
  *
  * @return The tap-hold configuration
  */
 uint8_t user_config_tap_hold(void);
+
+/**
+ * @brief Set the tap-hold configuration in the user configuration
+ *
+ * @param tap_hold The tap-hold configuration
+ *
+ * @return none
+ */
+void user_config_set_tap_hold(uint8_t tap_hold);
 
 /**
  * @brief Get the current profile from the user configuration
@@ -200,6 +222,18 @@ void user_config_set_current_profile(uint8_t profile);
  * @return The key configuration
  */
 key_config_t *user_config_key_config(uint8_t profile, uint16_t index);
+
+/**
+ * @brief Set the key configuration in the user configuration
+ *
+ * @param profile The profile
+ * @param index The key index
+ * @param key_config The key configuration
+ *
+ * @return none
+ */
+void user_config_set_key_config(uint8_t profile, uint16_t index,
+                                const key_config_t *key_config);
 
 /**
  * @brief Get the keymap from the user configuration
@@ -235,3 +269,15 @@ void user_config_set_keymap(uint8_t profile, uint8_t layer, uint16_t index,
  */
 dynamic_keystroke_config_t *
 user_config_dynamic_keystroke_config(uint8_t profile, uint8_t index);
+
+/**
+ * @brief Set the dynamic keystroke configuration in the user configuration
+ *
+ * @param profile The profile
+ * @param index The dynamic keystroke index
+ * @param config The dynamic keystroke configuration
+ *
+ * @return none
+ */
+void user_config_set_dynamic_keystroke_config(
+    uint8_t profile, uint8_t index, const dynamic_keystroke_config_t *config);

@@ -20,11 +20,14 @@
 #include "switches.h"
 #include "tusb.h"
 #include "usb_descriptors.h"
-#include "user_config.h"
 
 //--------------------------------------------------------------------+
 // TinyUSB Vendor Callbacks
 //--------------------------------------------------------------------+
+
+// Not the best way to access the user configuration, but it saves us from
+// defining temporary buffers for each response.
+extern const user_config_t user_config;
 
 #if defined(ENABLE_WEB_CONFIGURATOR)
 static uint8_t request_buffer[VENDOR_REQUEST_BUFFER_SIZE];
@@ -91,30 +94,29 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
     case TUSB_REQ_TYPE_CLASS:
         switch (request->bRequest) {
         case CLASS_REQUEST_PROTOCOL_VERSION:
-
             if (stage == CONTROL_STAGE_SETUP) {
-                if (request->wLength < sizeof(class_res_protocol_version_t))
+                static const uint16_t res = VENDOR_CLASS_PROTOCOL_VERSION;
+
+                if (request->wLength < sizeof(res))
                     // Invalid response length
                     return false;
 
-                static class_res_protocol_version_t res;
-                res.protocol_version = VENDOR_CLASS_PROTOCOL_VERSION;
-
-                return tud_control_xfer(rhport, request, &res, sizeof(res));
+                return tud_control_xfer(rhport, request, (void *)&res,
+                                        sizeof(res));
             }
             // Nothing to do for DATA & ACK stages
             return true;
 
         case CLASS_REQUEST_FIRMWARE_VERSION:
             if (stage == CONTROL_STAGE_SETUP) {
-                if (request->wLength < sizeof(class_res_firmware_version_t))
+                static const uint16_t res = FIRMWARE_VERSION;
+
+                if (request->wLength < sizeof(res))
                     // Invalid response length
                     return false;
 
-                static class_res_firmware_version_t res;
-                res.firmware_version = FIRMWARE_VERSION;
-
-                return tud_control_xfer(rhport, request, &res, sizeof(res));
+                return tud_control_xfer(rhport, request, (void *)&res,
+                                        sizeof(res));
             }
             // Nothing to do for DATA & ACK stages
             return true;
@@ -155,37 +157,154 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
 
         case CLASS_REQUEST_SWITCH_DEBUG:
             if (stage == CONTROL_STAGE_SETUP) {
-                if (request->wLength < sizeof(switch_state_t))
+                static class_res_switch_debug_t res;
+
+                if (request->wLength < sizeof(res))
                     // Invalid response length
                     return false;
 
-                static class_res_switch_debug_t res;
                 for (uint32_t i = 0; i < NUM_KEYS; i++) {
                     res.adc_values[i] = get_switch_adc_value(i);
                     res.distances[i] = get_switch_distance(i);
                 }
 
-                return tud_control_xfer(rhport, request, &res, sizeof(res));
+                return tud_control_xfer(rhport, request, (void *)&res,
+                                        sizeof(res));
             }
             // Nothing to do for DATA & ACK stages
             return true;
+
+        case CLASS_REQUEST_SW_ID:
+            switch (request->wValue) {
+            case CLASS_REQUEST_INDEX_GET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    const uint32_t len = sizeof(user_config.sw_id);
+
+                    if (request->wLength < len)
+                        // Invalid response length
+                        return false;
+
+                    return tud_control_xfer(rhport, request,
+                                            (void *)&user_config.sw_id, len);
+                }
+                // Nothing to do for DATA & ACK stages
+                return true;
+
+            case CLASS_REQUEST_INDEX_SET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    if (request->wLength != sizeof(user_config.sw_id))
+                        // Invalid request length
+                        return false;
+
+                    return tud_control_xfer(rhport, request, request_buffer,
+                                            request->wLength);
+                } else if (stage == CONTROL_STAGE_DATA) {
+                    user_config_set_sw_id(request_buffer[0]);
+                    return true;
+                }
+                // Nothing to do for ACK stage
+                return true;
+
+            default:
+                break;
+            }
+            break;
+
+        case CLASS_REQUEST_TAP_HOLD:
+            switch (request->wValue) {
+            case CLASS_REQUEST_INDEX_GET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    const uint32_t len = sizeof(user_config.tap_hold);
+
+                    if (request->wLength < len)
+                        // Invalid response length
+                        return false;
+
+                    return tud_control_xfer(rhport, request,
+                                            (void *)&user_config.tap_hold, len);
+                }
+                // Nothing to do for DATA & ACK stages
+                return true;
+
+            case CLASS_REQUEST_INDEX_SET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    if (request->wLength != sizeof(user_config.tap_hold))
+                        // Invalid request length
+                        return false;
+
+                    return tud_control_xfer(rhport, request, request_buffer,
+                                            request->wLength);
+                } else if (stage == CONTROL_STAGE_DATA) {
+                    user_config_set_tap_hold(request_buffer[0]);
+                    return true;
+                }
+                // Nothing to do for ACK stage
+                return true;
+
+            default:
+                break;
+            }
+            break;
+
+        case CLASS_REQUEST_KEY_CONFIG:
+            switch (request->wValue) {
+            case CLASS_REQUEST_INDEX_GET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    const uint32_t len = sizeof(user_config.key_config);
+
+                    if (request->wLength < len)
+                        // Invalid response length
+                        return false;
+
+                    return tud_control_xfer(
+                        rhport, request, (void *)user_config.key_config, len);
+                }
+                // Nothing to do for DATA & ACK stages
+                return true;
+
+            case CLASS_REQUEST_INDEX_SET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    if (request->wLength % sizeof(class_req_key_config_t) !=
+                            0 ||
+                        request->wLength > VENDOR_REQUEST_BUFFER_SIZE)
+                        // Invalid request length
+                        return false;
+
+                    return tud_control_xfer(rhport, request, request_buffer,
+                                            request->wLength);
+                } else if (stage == CONTROL_STAGE_DATA) {
+                    const uint32_t num_reqs =
+                        request->wLength / sizeof(class_req_key_config_t);
+                    const class_req_key_config_t *reqs =
+                        (class_req_key_config_t *)request_buffer;
+
+                    for (uint32_t i = 0; i < num_reqs; i++)
+                        user_config_set_key_config(reqs[i].profile,
+                                                   reqs[i].index,
+                                                   &reqs[i].key_config);
+
+                    return true;
+                }
+                // Nothing to do for ACK stage
+                return true;
+
+            default:
+                break;
+            }
+            break;
 
         case CLASS_REQUEST_KEYMAP:
             switch (request->wValue) {
             case CLASS_REQUEST_INDEX_GET:
                 if (stage == CONTROL_STAGE_SETUP) {
-                    if (request->wLength < sizeof(class_res_keymap_t))
+                    const uint32_t len = sizeof(user_config.keymap);
+
+                    if (request->wLength < len)
                         // Invalid response length
                         return false;
 
-                    static class_res_keymap_t res;
-                    for (uint32_t i = 0; i < NUM_PROFILES; i++)
-                        for (uint32_t j = 0; j < NUM_LAYERS; j++)
-                            for (uint32_t k = 0; k < NUM_KEYS; k++)
-                                res.keymap[i][j][k] =
-                                    user_config_keymap(i, j, k);
-
-                    return tud_control_xfer(rhport, request, &res, sizeof(res));
+                    return tud_control_xfer(rhport, request,
+                                            (void *)user_config.keymap, len);
                 }
                 // Nothing to do for DATA & ACK stages
                 return true;
@@ -208,6 +327,55 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
                     for (uint32_t i = 0; i < num_reqs; i++)
                         user_config_set_keymap(reqs[i].profile, reqs[i].layer,
                                                reqs[i].index, reqs[i].keycode);
+
+                    return true;
+                }
+                // Nothing to do for ACK stage
+                return true;
+
+            default:
+                break;
+            }
+            break;
+
+        case CLASS_REQUEST_DKS_CONFIG:
+            switch (request->wValue) {
+            case CLASS_REQUEST_INDEX_GET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    const uint32_t len =
+                        sizeof(user_config.dynamic_keystroke_config);
+
+                    if (request->wLength < len)
+                        // Invalid response length
+                        return false;
+
+                    return tud_control_xfer(
+                        rhport, request,
+                        (void *)user_config.dynamic_keystroke_config, len);
+                }
+                // Nothing to do for DATA & ACK stages
+                return true;
+
+            case CLASS_REQUEST_INDEX_SET:
+                if (stage == CONTROL_STAGE_SETUP) {
+                    if (request->wLength % sizeof(class_req_dks_config_t) !=
+                            0 ||
+                        request->wLength > VENDOR_REQUEST_BUFFER_SIZE)
+                        // Invalid request length
+                        return false;
+
+                    return tud_control_xfer(rhport, request, request_buffer,
+                                            request->wLength);
+                } else if (stage == CONTROL_STAGE_DATA) {
+                    const uint32_t num_reqs =
+                        request->wLength / sizeof(class_req_dks_config_t);
+                    const class_req_dks_config_t *reqs =
+                        (class_req_dks_config_t *)request_buffer;
+
+                    for (uint32_t i = 0; i < num_reqs; i++)
+                        user_config_set_dynamic_keystroke_config(
+                            reqs[i].profile, reqs[i].index,
+                            &reqs[i].dks_config);
 
                     return true;
                 }

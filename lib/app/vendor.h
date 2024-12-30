@@ -18,6 +18,7 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "user_config.h"
 
 //--------------------------------------------------------------------+
 // USB Vendor Definitions
@@ -33,7 +34,7 @@
 #if !defined(VENDOR_BUFFER_SIZE)
 // The size of the vendor request buffer. Must be large enough to hold the
 // largest vendor class request.
-#define VENDOR_REQUEST_BUFFER_SIZE 1024
+#define VENDOR_REQUEST_BUFFER_SIZE 4096
 #endif
 
 // Version of the vendor class protocol
@@ -52,7 +53,11 @@ enum {
     CLASS_REQUEST_FACTORY_RESET,
     CLASS_REQUEST_RECALIBRATE,
     CLASS_REQUEST_SWITCH_DEBUG,
+    CLASS_REQUEST_SW_ID,
+    CLASS_REQUEST_TAP_HOLD,
+    CLASS_REQUEST_KEY_CONFIG,
     CLASS_REQUEST_KEYMAP,
+    CLASS_REQUEST_DKS_CONFIG,
 };
 
 enum {
@@ -65,21 +70,9 @@ enum {
 //--------------------------------------------------------------------+
 
 typedef struct __attribute__((packed)) {
-    uint16_t protocol_version;
-} class_res_protocol_version_t;
-
-typedef struct __attribute__((packed)) {
-    uint16_t firmware_version;
-} class_res_firmware_version_t;
-
-typedef struct __attribute__((packed)) {
     uint16_t adc_values[NUM_KEYS];
     uint8_t distances[NUM_KEYS];
 } class_res_switch_debug_t;
-
-typedef struct __attribute__((packed)) {
-    uint16_t keymap[NUM_PROFILES][NUM_LAYERS][NUM_KEYS];
-} class_res_keymap_t;
 
 typedef struct __attribute__((packed)) {
     uint8_t profile;
@@ -87,3 +80,15 @@ typedef struct __attribute__((packed)) {
     uint16_t index;
     uint16_t keycode;
 } class_req_keymap_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t profile;
+    uint16_t index;
+    key_config_t key_config;
+} class_req_key_config_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t profile;
+    uint16_t index;
+    dynamic_keystroke_config_t dks_config;
+} class_req_dks_config_t;
