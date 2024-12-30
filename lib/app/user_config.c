@@ -107,6 +107,6 @@ void user_config_set_keymap(uint8_t profile, uint8_t layer, uint16_t index,
 }
 
 dynamic_keystroke_config_t *
-user_config_dynamic_keystroke_config(uint8_t index) {
-    return &user_config.dynamic_keystroke_config[index];
+user_config_dynamic_keystroke_config(uint8_t profile, uint8_t index) {
+    return &user_config.dynamic_keystroke_config[profile][index];
 }

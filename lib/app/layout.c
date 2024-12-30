@@ -148,7 +148,8 @@ void layout_process_dks(uint16_t index, uint8_t config_num, uint8_t sw_state,
         return;
 
     const dynamic_keystroke_config_t *config =
-        user_config_dynamic_keystroke_config(config_num);
+        user_config_dynamic_keystroke_config(user_config_current_profile(),
+                                             config_num);
 
     for (uint32_t i = 0; i < 4; i++) {
         const uint8_t keycode = config->keycode[i];

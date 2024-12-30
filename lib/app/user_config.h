@@ -47,7 +47,7 @@ _Static_assert(NUM_LAYERS <= 16, "Invalid number of layers");
 _Static_assert(NUM_KEYS <= UINT16_MAX, "Invalid number of keys");
 
 #if !defined(NUM_DYNAMIC_KEYSTROKE_CONFIGS)
-// The number of dynamic keystroke configurations
+// The number of dynamic keystroke configurations per profile
 #define NUM_DYNAMIC_KEYSTROKE_CONFIGS 16
 #endif
 
@@ -84,13 +84,6 @@ typedef struct __attribute__((packed)) {
 } key_mode_rapid_trigger_t;
 
 typedef struct __attribute__((packed)) {
-    // Actuation distance in 0.05mm
-    uint8_t actuation_distance;
-    // Bottom-out distance in 0.05mm
-    uint8_t bottom_out_distance;
-} key_mode_dynamic_keystroke_t;
-
-typedef struct __attribute__((packed)) {
     // Tapping term in milliseconds
     uint16_t tapping_term;
     uint8_t mode;
@@ -98,7 +91,6 @@ typedef struct __attribute__((packed)) {
     union {
         key_mode_normal_t nm;
         key_mode_rapid_trigger_t rt;
-        key_mode_dynamic_keystroke_t dks;
     };
 } key_config_t;
 
@@ -146,7 +138,7 @@ typedef struct __attribute__((packed)) {
     key_config_t key_config[NUM_PROFILES][NUM_KEYS];
     uint16_t keymap[NUM_PROFILES][NUM_LAYERS][NUM_KEYS];
     dynamic_keystroke_config_t
-        dynamic_keystroke_config[NUM_DYNAMIC_KEYSTROKE_CONFIGS];
+        dynamic_keystroke_config[NUM_PROFILES][NUM_DYNAMIC_KEYSTROKE_CONFIGS];
 } user_config_t;
 
 _Static_assert(sizeof(user_config_t) <= EEPROM_BYTES,
@@ -236,8 +228,10 @@ void user_config_set_keymap(uint8_t profile, uint8_t layer, uint16_t index,
 /**
  * @brief Get the dynamic keystroke configuration from the user configuration
  *
+ * @param profile The profile
  * @param index The dynamic keystroke index
  *
  * @return The dynamic keystroke configuration
  */
-dynamic_keystroke_config_t *user_config_dynamic_keystroke_config(uint8_t index);
+dynamic_keystroke_config_t *
+user_config_dynamic_keystroke_config(uint8_t profile, uint8_t index);
