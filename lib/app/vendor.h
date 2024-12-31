@@ -76,6 +76,12 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
     uint8_t profile;
+    uint16_t index;
+    key_config_t key_config;
+} class_req_key_config_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t profile;
     uint8_t layer;
     uint16_t index;
     uint16_t keycode;
@@ -83,12 +89,6 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
     uint8_t profile;
-    uint16_t index;
-    key_config_t key_config;
-} class_req_key_config_t;
-
-typedef struct __attribute__((packed)) {
-    uint8_t profile;
-    uint16_t index;
+    uint8_t index;
     dynamic_keystroke_config_t dks_config;
 } class_req_dks_config_t;

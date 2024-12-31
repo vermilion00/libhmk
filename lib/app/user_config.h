@@ -146,6 +146,25 @@ _Static_assert(sizeof(user_config_t) <= EEPROM_BYTES,
                "User configuration size exceeds EEPROM size");
 
 //--------------------------------------------------------------------+
+// User Configuration Macros
+//--------------------------------------------------------------------+
+
+#define SW_ID_OFFSET offsetof(user_config_t, sw_id)
+#define TAP_HOLD_OFFSET offsetof(user_config_t, tap_hold)
+#define CURRENT_PROFILE_OFFSET offsetof(user_config_t, current_profile)
+#define KEY_CONFIG_OFFSET(profile, index)                                      \
+    (offsetof(user_config_t, key_config) +                                     \
+     sizeof(key_config_t) * (profile * NUM_KEYS + index))
+#define KEYMAP_OFFSET(profile, layer, index)                                   \
+    (offsetof(user_config_t, keymap) +                                         \
+     sizeof(uint16_t) *                                                        \
+         (profile * NUM_LAYERS * NUM_KEYS + layer * NUM_KEYS + index))
+#define DYNAMIC_KEYSTROKE_CONFIG_OFFSET(profile, index)                        \
+    (offsetof(user_config_t, dynamic_keystroke_config) +                       \
+     sizeof(dynamic_keystroke_config_t) *                                      \
+         (profile * NUM_DYNAMIC_KEYSTROKE_CONFIGS + index))
+
+//--------------------------------------------------------------------+
 // User Configuration APIs
 //--------------------------------------------------------------------+
 

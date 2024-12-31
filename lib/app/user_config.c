@@ -74,8 +74,7 @@ void user_config_set_sw_id(uint8_t sw_id) {
 
     user_config.sw_id = sw_id;
     user_config_save_crc32();
-    eeprom_write(offsetof(user_config_t, sw_id), &user_config.sw_id,
-                 sizeof(uint8_t));
+    eeprom_write(SW_ID_OFFSET, &user_config.sw_id, sizeof(uint8_t));
 }
 
 uint8_t user_config_tap_hold(void) { return user_config.tap_hold; }
@@ -86,8 +85,7 @@ void user_config_set_tap_hold(uint8_t tap_hold) {
 
     user_config.tap_hold = tap_hold;
     user_config_save_crc32();
-    eeprom_write(offsetof(user_config_t, tap_hold), &user_config.tap_hold,
-                 sizeof(uint8_t));
+    eeprom_write(TAP_HOLD_OFFSET, &user_config.tap_hold, sizeof(uint8_t));
 }
 
 uint8_t user_config_current_profile(void) {
@@ -100,7 +98,7 @@ void user_config_set_current_profile(uint8_t profile) {
 
     user_config.current_profile = profile;
     user_config_save_crc32();
-    eeprom_write(offsetof(user_config_t, current_profile),
+    eeprom_write(CURRENT_PROFILE_OFFSET,
                  (uint8_t *)&user_config.current_profile, sizeof(uint8_t));
 }
 
@@ -115,8 +113,7 @@ void user_config_set_key_config(uint8_t profile, uint16_t index,
 
     user_config.key_config[profile][index] = *key_config;
     user_config_save_crc32();
-    eeprom_write(offsetof(user_config_t, key_config) +
-                     sizeof(key_config_t) * (profile * NUM_KEYS + index),
+    eeprom_write(KEY_CONFIG_OFFSET(profile, index),
                  (uint8_t *)&user_config.key_config[profile][index],
                  sizeof(key_config_t));
 }
@@ -132,9 +129,7 @@ void user_config_set_keymap(uint8_t profile, uint8_t layer, uint16_t index,
 
     user_config.keymap[profile][layer][index] = keymap;
     user_config_save_crc32();
-    eeprom_write(offsetof(user_config_t, keymap) +
-                     sizeof(uint16_t) * (profile * NUM_LAYERS * NUM_KEYS +
-                                         layer * NUM_KEYS + index),
+    eeprom_write(KEYMAP_OFFSET(profile, layer, index),
                  (uint8_t *)&user_config.keymap[profile][layer][index],
                  sizeof(uint16_t));
 }
@@ -152,9 +147,7 @@ void user_config_set_dynamic_keystroke_config(
     user_config.dynamic_keystroke_config[profile][index] = *config;
     user_config_save_crc32();
     eeprom_write(
-        offsetof(user_config_t, dynamic_keystroke_config) +
-            sizeof(dynamic_keystroke_config_t) *
-                (profile * NUM_DYNAMIC_KEYSTROKE_CONFIGS + index),
+        DYNAMIC_KEYSTROKE_CONFIG_OFFSET(profile, index),
         (uint8_t *)&user_config.dynamic_keystroke_config[profile][index],
         sizeof(dynamic_keystroke_config_t));
 }
