@@ -29,16 +29,10 @@
 #define MAX_PENDING_EVENTS 32
 #endif
 
-_Static_assert((MAX_PENDING_EVENTS & (MAX_PENDING_EVENTS - 1)) == 0,
-               "MAX_PENDING_EVENTS must be a power of 2");
-
 #if !defined(MAX_TAP_HOLD_EVENTS)
 // The maximum number of tap-hold events in the event queue per matrix scan
 #define MAX_TAP_HOLD_EVENTS 32
 #endif
-
-_Static_assert((MAX_TAP_HOLD_EVENTS & (MAX_TAP_HOLD_EVENTS - 1)) == 0,
-               "MAX_TAP_HOLD_EVENTS must be a power of 2");
 
 #if !defined(MAX_POST_HID_REPORT_EVENTS)
 // The maximum number of post-HID report events in the event queue per matrix
@@ -46,6 +40,10 @@ _Static_assert((MAX_TAP_HOLD_EVENTS & (MAX_TAP_HOLD_EVENTS - 1)) == 0,
 #define MAX_POST_HID_REPORT_EVENTS 32
 #endif
 
+_Static_assert((MAX_TAP_HOLD_EVENTS & (MAX_TAP_HOLD_EVENTS - 1)) == 0,
+               "MAX_TAP_HOLD_EVENTS must be a power of 2");
+_Static_assert((MAX_PENDING_EVENTS & (MAX_PENDING_EVENTS - 1)) == 0,
+               "MAX_PENDING_EVENTS must be a power of 2");
 _Static_assert((MAX_POST_HID_REPORT_EVENTS &
                 (MAX_POST_HID_REPORT_EVENTS - 1)) == 0,
                "MAX_POST_HID_REPORT_EVENTS must be a power of 2");

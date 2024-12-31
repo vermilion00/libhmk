@@ -36,15 +36,14 @@
 #define FLASH_PROGRAM_TYPE FLASH_TYPEPROGRAM_WORD
 #define FLASH_WRITE_SIZE (1 << FLASH_PROGRAM_TYPE)
 
-_Static_assert(EEPROM_BYTES % FLASH_WRITE_SIZE == 0,
-               "EEPROM size must be a multiple of 4");
-
 #define EEPROM_BACKING_STORE_SIZE (EEPROM_BYTES << 1)
 
+#define MAX_BYTES_PER_LOG_ENTRY 5
+
+_Static_assert(EEPROM_BYTES % FLASH_WRITE_SIZE == 0,
+               "EEPROM size must be a multiple of 4");
 _Static_assert(EEPROM_BACKING_STORE_SIZE <= FLASH_SIZE,
                "Not enough flash memory for EEPROM");
-
-#define MAX_BYTES_PER_LOG_ENTRY 5
 
 //--------------------------------------------------------------------+
 // Wear Leveling Types

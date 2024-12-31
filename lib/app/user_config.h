@@ -31,26 +31,23 @@
 #define NUM_PROFILES 4
 #endif
 
-_Static_assert(NUM_PROFILES <= 16, "Invalid number of profiles");
-
 #if !defined(NUM_LAYERS)
 // The number of layers
 #define NUM_LAYERS 4
 #endif
 
-_Static_assert(NUM_LAYERS <= 16, "Invalid number of layers");
-
 #if !defined(NUM_KEYS)
 #error "NUM_KEYS must be defined"
 #endif
-
-_Static_assert(NUM_KEYS <= UINT16_MAX, "Invalid number of keys");
 
 #if !defined(NUM_DYNAMIC_KEYSTROKE_CONFIGS)
 // The number of dynamic keystroke configurations per profile
 #define NUM_DYNAMIC_KEYSTROKE_CONFIGS 16
 #endif
 
+_Static_assert(NUM_PROFILES <= 16, "Invalid number of profiles");
+_Static_assert(NUM_LAYERS <= 16, "Invalid number of layers");
+_Static_assert(NUM_KEYS <= UINT16_MAX, "Invalid number of keys");
 _Static_assert(NUM_DYNAMIC_KEYSTROKE_CONFIGS <= 256,
                "Invalid number of dynamic keystroke configurations");
 
