@@ -259,7 +259,7 @@ void layout_process_events(void) {
                 user_config_set_current_profile(
                     SP_PROFILE_TO_GET_PROFILE(keycode));
             } else if (IS_DKS_KEYCODE(keycode)) {
-                layout_process_dks(event->index, DKS_GET_CONFIG(keycode),
+                layout_process_dks(event->index, SP_DKS_GET_CONFIG(keycode),
                                    event->sw_state,
                                    last_sw_states[event->index]);
             } else if (IS_MAGIC_KEYCODE(keycode)) {
@@ -293,7 +293,7 @@ void layout_process_events(void) {
             } else if (IS_PROFILE_TO_KEYCODE(keycode)) {
                 // Nothing to do
             } else if (IS_DKS_KEYCODE(keycode)) {
-                layout_process_dks(event->index, DKS_GET_CONFIG(keycode),
+                layout_process_dks(event->index, SP_DKS_GET_CONFIG(keycode),
                                    event->sw_state,
                                    last_sw_states[event->index]);
             } else if (IS_MAGIC_KEYCODE(keycode)) {
@@ -303,7 +303,7 @@ void layout_process_events(void) {
             uint16_t keycode = active_keycodes[event->index];
 
             if (IS_DKS_KEYCODE(keycode)) {
-                layout_process_dks(event->index, DKS_GET_CONFIG(keycode),
+                layout_process_dks(event->index, SP_DKS_GET_CONFIG(keycode),
                                    event->sw_state,
                                    last_sw_states[event->index]);
             }

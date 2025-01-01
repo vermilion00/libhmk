@@ -571,7 +571,7 @@ enum {
 
 #define DKS(config) ((config) | SP_DKS)
 
-#define DKS_GET_CONFIG(keycode) ((keycode) & 0x00FF)
+#define SP_DKS_GET_CONFIG(keycode) ((keycode) & 0x00FF)
 
 //--------------------------------------------------------------------+
 // Keycode APIs
