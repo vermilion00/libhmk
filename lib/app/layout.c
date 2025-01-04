@@ -118,16 +118,35 @@ uint16_t get_keycode(uint16_t index) {
 // Layout APIs
 //--------------------------------------------------------------------+
 
+static bool pending_event_unlocked;
 static uint32_t pending_event_head, num_pending_events;
 static layout_event_t pending_events[MAX_PENDING_EVENTS];
 
+#define PENDING_EVENT_FOREACH(i, event, block)                                 \
+    do {                                                                       \
+        pending_event_unlocked = false;                                        \
+        for (uint32_t(i) = 0; (i) < num_pending_events; (i)++) {               \
+            const layout_event_t *(event) =                                    \
+                &pending_events[(pending_event_head + (i)) &                   \
+                                (MAX_PENDING_EVENTS - 1)];                     \
+            (block);                                                           \
+        }                                                                      \
+        pending_event_unlocked = true;                                         \
+    } while (0)
+
 void layout_event_init(void) {
+    pending_event_unlocked = true;
     pending_event_head = 0;
     num_pending_events = 0;
     memset(pending_events, 0, sizeof(pending_events));
 }
 
 void layout_event_push(uint16_t index, uint8_t sw_state) {
+    if (!pending_event_unlocked)
+        return;
+
+    pending_event_unlocked = false;
+
     if (num_pending_events == MAX_PENDING_EVENTS) {
         // The event queue is full
         pending_event_head =
@@ -140,6 +159,8 @@ void layout_event_push(uint16_t index, uint8_t sw_state) {
     pending_events[pending_event_tail].index = index;
     pending_events[pending_event_tail].sw_state = sw_state;
     num_pending_events++;
+
+    pending_event_unlocked = true;
 }
 
 void layout_process_dks(uint16_t index, uint8_t config_num, uint8_t sw_state,
@@ -227,10 +248,7 @@ void layout_process_magic_keycode(uint16_t keycode) {
 }
 
 void layout_process_events(void) {
-    for (uint32_t i = 0; i < num_pending_events; i++) {
-        const layout_event_t *event = &pending_events[(pending_event_head + i) &
-                                                      (MAX_PENDING_EVENTS - 1)];
-
+    PENDING_EVENT_FOREACH(i, event, {
         if (IS_SW_PRESSED(event->sw_state, last_sw_states[event->index])) {
             uint16_t keycode = get_keycode(event->index);
             active_keycodes[event->index] = keycode;
@@ -311,7 +329,7 @@ void layout_process_events(void) {
 
         // Update the last switch state
         last_sw_states[event->index] = event->sw_state;
-    }
+    });
 
     // Clear the event queue
     pending_event_head = 0;
@@ -322,22 +340,38 @@ void layout_process_events(void) {
 // Tap-Hold APIs
 //--------------------------------------------------------------------+
 
+static bool tap_hold_event_unlocked;
 static uint32_t num_tap_hold_events;
 static layout_tap_hold_event_t tap_hold_events[MAX_TAP_HOLD_EVENTS];
 
+#define TAP_HOLD_EVENT_FOREACH(i, event, block)                                \
+    do {                                                                       \
+        tap_hold_event_unlocked = false;                                       \
+        for (uint32_t(i) = 0; (i) < num_tap_hold_events; (i)++) {              \
+            const layout_tap_hold_event_t *(event) = &tap_hold_events[(i)];    \
+            (block);                                                           \
+        }                                                                      \
+        tap_hold_event_unlocked = true;                                        \
+    } while (0)
+
 void layout_tap_hold_event_init(void) {
+    tap_hold_event_unlocked = true;
     num_tap_hold_events = 0;
     memset(tap_hold_events, 0, sizeof(tap_hold_events));
 }
 
 void layout_tap_hold_event_push(uint16_t index, uint16_t keycode) {
-    if (num_tap_hold_events == MAX_TAP_HOLD_EVENTS)
+    if (!tap_hold_event_unlocked || num_tap_hold_events == MAX_TAP_HOLD_EVENTS)
         return;
+
+    tap_hold_event_unlocked = false;
 
     tap_hold_events[num_tap_hold_events].index = index;
     tap_hold_events[num_tap_hold_events].keycode = keycode;
     tap_hold_events[num_tap_hold_events].since = timer_read();
     num_tap_hold_events++;
+
+    tap_hold_event_unlocked = true;
 }
 
 void layout_process_tap_action(uint16_t index, uint16_t keycode) {
@@ -386,20 +420,16 @@ void layout_tick_event(void) {
     memset(has_release_events, 0, sizeof(has_release_events));
 
     bool has_press_events = false;
-    for (uint32_t i = 0; i < num_pending_events; i++) {
-        const layout_event_t *event = &pending_events[(pending_event_head + i) &
-                                                      (MAX_PENDING_EVENTS - 1)];
-
+    PENDING_EVENT_FOREACH(i, event, {
         if (IS_SW_PRESSED(event->sw_state, last_sw_states[event->index]))
             has_press_events = true;
         else if (IS_SW_RELEASED(event->sw_state, last_sw_states[event->index]))
             has_release_events[event->index >> 5] |= 1
                                                      << (event->index & 0x001F);
-    }
+    });
 
     uint32_t free_stack_slot = 0;
-    for (uint32_t i = 0; i < num_tap_hold_events; i++) {
-        layout_tap_hold_event_t *event = &tap_hold_events[i];
+    TAP_HOLD_EVENT_FOREACH(i, event, {
         const uint16_t tapping_term =
             user_config_key_config(current_profile, event->index)->tapping_term;
 
@@ -429,7 +459,7 @@ void layout_tick_event(void) {
                 tap_hold_events[free_stack_slot] = *event;
             free_stack_slot++;
         }
-    }
+    });
 
     num_tap_hold_events = free_stack_slot;
 }
@@ -438,11 +468,25 @@ void layout_tick_event(void) {
 // Post-HID-Report APIs
 //--------------------------------------------------------------------+
 
+static bool post_hid_report_event_unlocked;
 static uint32_t post_hid_report_event_head, num_post_hid_report_events;
 static layout_post_hid_report_event_t
     post_hid_report_events[MAX_POST_HID_REPORT_EVENTS];
 
+#define POST_HID_REPORT_EVENT_FOREACH(i, event, block)                         \
+    do {                                                                       \
+        post_hid_report_event_unlocked = false;                                \
+        for (uint32_t(i) = 0; (i) < num_post_hid_report_events; (i)++) {       \
+            const layout_post_hid_report_event_t *(event) =                    \
+                &post_hid_report_events[(post_hid_report_event_head + (i)) &   \
+                                        (MAX_POST_HID_REPORT_EVENTS - 1)];     \
+            (block);                                                           \
+        }                                                                      \
+        post_hid_report_event_unlocked = true;                                 \
+    } while (0)
+
 void layout_post_hid_report_event_init(void) {
+    post_hid_report_event_unlocked = true;
     post_hid_report_event_head = 0;
     num_post_hid_report_events = 0;
     memset(post_hid_report_events, 0, sizeof(post_hid_report_events));
@@ -450,11 +494,14 @@ void layout_post_hid_report_event_init(void) {
 
 void layout_post_hid_report_event_push(uint16_t index, uint8_t keycode,
                                        uint8_t action) {
+    if (!post_hid_report_event_unlocked)
+        return;
+
+    post_hid_report_event_unlocked = false;
+
     if (num_post_hid_report_events == MAX_POST_HID_REPORT_EVENTS) {
-        // If the event queue is full, we should execute the oldest event now.
-        // We also do not allow pushing more events to the queue at this point.
         layout_process_post_hid_report_event(
-            &post_hid_report_events[post_hid_report_event_head], false);
+            &post_hid_report_events[post_hid_report_event_head]);
         post_hid_report_event_head =
             (post_hid_report_event_head + 1) & (MAX_POST_HID_REPORT_EVENTS - 1);
         num_post_hid_report_events--;
@@ -467,10 +514,12 @@ void layout_post_hid_report_event_push(uint16_t index, uint8_t keycode,
     post_hid_report_events[post_hid_report_event_tail].keycode = keycode;
     post_hid_report_events[post_hid_report_event_tail].action = action;
     num_post_hid_report_events++;
+
+    post_hid_report_event_unlocked = true;
 }
 
 void layout_process_post_hid_report_event(
-    const layout_post_hid_report_event_t *event, bool allow_push) {
+    const layout_post_hid_report_event_t *event) {
     switch (event->action) {
     case POST_HID_REPORT_ACTION_ADD:
         hid_add_keycode(event->keycode);
@@ -481,9 +530,9 @@ void layout_process_post_hid_report_event(
         break;
 
     case POST_HID_REPORT_ACTION_TAP:
-        if (allow_push)
-            // Tap action will add release event to the queue.
-            layout_process_tap_action(event->index, event->keycode);
+        // May not be processed if this function is called when the event queue
+        // is full and we try to push a new event
+        layout_process_tap_action(event->index, event->keycode);
         break;
 
     default:
@@ -497,21 +546,16 @@ void layout_process_post_hid_report_events(void) {
     if (num_post_hid_report_events == 0)
         return;
 
-    // Copy the events to a temporary buffer to avoid pushing new events while
-    // we are clearing the queue
-    const uint32_t head = post_hid_report_event_head;
+    // Copy the events to a temporary buffer to allow pushing new events while
+    // we are clearing the queue later
     const uint32_t len = num_post_hid_report_events;
 
-    for (uint32_t i = 0; i < len; i++)
-        buffer[i] =
-            post_hid_report_events[(head + i) & (MAX_PENDING_EVENTS - 1)];
+    POST_HID_REPORT_EVENT_FOREACH(i, event, { buffer[i] = *event; });
 
     // Clear the event queue
     post_hid_report_event_head = 0;
     num_post_hid_report_events = 0;
 
     for (uint32_t i = 0; i < len; i++)
-        // We have already cleared the event queue, so we can allow pushing more
-        // events.
-        layout_process_post_hid_report_event(&buffer[i], true);
+        layout_process_post_hid_report_event(&buffer[i]);
 }
