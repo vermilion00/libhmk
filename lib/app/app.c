@@ -44,10 +44,6 @@ static uint32_t polling_counter;
 void app_task(void) {
     tud_task();
 
-    // Wait for the switch calibration to finish in the case of a recalibration
-    // request through WebUSB
-    wait_for_switch_calibration();
-
     // Perform user-defined ADC task
     adc_user_task();
 
