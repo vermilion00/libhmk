@@ -22,7 +22,9 @@
 
 void hardware_init(void) {
     adc_init();
+#if defined(DEBUG)
     debug_init();
+#endif
     eeprom_init();
     timer_init();
 }
