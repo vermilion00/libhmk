@@ -76,6 +76,56 @@ void user_config_set_sw_id(uint8_t sw_id) {
         return;
 
     user_config.sw_id = sw_id;
+
+    // Ensure the key configurations are within the switch's travel distance
+    const uint16_t distance = sw_distance[sw_id];
+    for (uint32_t i = 0; i < NUM_PROFILES; i++) {
+        for (uint32_t j = 0; j < NUM_KEYS; j++) {
+            key_config_t *config = &user_config.key_config[i][j];
+            bool changed = false;
+
+            switch (config->mode) {
+            case KEY_MODE_NORMAL:
+                if (config->nm.actuation_distance > distance) {
+                    config->nm.actuation_distance = distance;
+                    changed = true;
+                }
+                if (config->nm.bottom_out_distance > distance) {
+                    config->nm.bottom_out_distance = distance;
+                    changed = true;
+                }
+                break;
+
+            case KEY_MODE_RAPID_TRIGGER:
+                if (config->rt.actuation_distance > distance) {
+                    config->rt.actuation_distance = distance;
+                    changed = true;
+                }
+                if (config->rt.reset_distance > distance) {
+                    config->rt.reset_distance = distance;
+                    changed = true;
+                }
+                if (config->rt.rt_down_distance > distance) {
+                    config->rt.rt_down_distance = distance;
+                    changed = true;
+                }
+                if (config->rt.rt_up_distance > distance) {
+                    config->rt.rt_up_distance = distance;
+                    changed = true;
+                }
+                break;
+
+            default:
+                break;
+            }
+
+            if (changed)
+                // Only save the key configuration if it was changed
+                eeprom_write(KEY_CONFIG_OFFSET(i, j), (uint8_t *)config,
+                             sizeof(key_config_t));
+        }
+    }
+
     user_config_save_crc32();
     eeprom_write(SW_ID_OFFSET, &user_config.sw_id, sizeof(uint8_t));
 }

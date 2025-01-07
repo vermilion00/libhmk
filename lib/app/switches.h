@@ -105,6 +105,9 @@ enum {
     SW_COUNT,
 };
 
+// Travel distance of the supported switches in 0.05mm
+extern const uint16_t sw_distance[];
+
 //--------------------------------------------------------------------+
 // Switch APIs
 //--------------------------------------------------------------------+

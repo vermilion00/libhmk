@@ -20,8 +20,7 @@
 #include "timer.h"
 #include "user_config.h"
 
-// Travel distance of the supported switches in 0.05mm
-static const uint16_t sw_distance[] = {
+const uint16_t sw_distance[] = {
     [SW_GEON_RAW_HE] = 68,
     [SW_GATERON_MAGNETIC_JADE] = 70,
     [SW_GEON_RAPTOR_HE] = 80,
