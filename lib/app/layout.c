@@ -184,18 +184,39 @@ void layout_process_dks(uint16_t index, uint8_t config_num, uint8_t sw_state,
         bool should_remove_keycode = false;
         uint8_t current_config;
 
-        if (IS_SW_PRESSED(sw_state, last_sw_state)) {
-            should_remove_keycode = false;
-            current_config = mask->config0;
-        } else if (IS_SW_PRESSED_BOTTOMED_OUT(sw_state, last_sw_state)) {
-            should_remove_keycode = (mask->config0 == 2);
-            current_config = mask->config1;
-        } else if (IS_SW_RELEASED_BOTTOMED_OUT(sw_state, last_sw_state)) {
-            should_remove_keycode = (mask->config0 == 3 || mask->config1 == 2);
-            current_config = mask->config2;
+        if (IS_SW_PRESSED(sw_state, last_sw_state) ||
+            IS_SW_PRESSED_BOTTOMED_OUT(sw_state, last_sw_state)) {
+            should_remove_keycode = true;
+            current_config = 0;
+
+            if (IS_SW_PRESSED(sw_state, last_sw_state)) {
+                // We press the switch for the first time so no need to remove
+                // the keycode.
+                should_remove_keycode = false;
+                current_config = mask->config0;
+            }
+            if (IS_SW_PRESSED_BOTTOMED_OUT(sw_state, last_sw_state)) {
+                // If the switch is pressed and bottomed out at the same time,
+                // no need to remove the keycode.
+                if (should_remove_keycode)
+                    should_remove_keycode = (mask->config0 == 2);
+                // If the switch is pressed and bottomed out at the same time
+                // and the pressed action is to hold the key beyond the
+                // bottom-out distance, ignore the bottom-out action.
+                current_config =
+                    current_config > 2 ? current_config : mask->config1;
+            }
         } else if (IS_SW_RELEASED(sw_state, last_sw_state)) {
+            // Consider key fully release before key releasing from bottom-out
+            // so that if both events are triggered at the same time, always
+            // consider the key fully released action.
             should_remove_keycode = true;
             current_config = mask->config3;
+        } else if (IS_SW_RELEASED_BOTTOMED_OUT(sw_state, last_sw_state)) {
+            // Only release the key if the previous actions hold the key up
+            // until this point.
+            should_remove_keycode = (mask->config0 == 3 || mask->config1 == 2);
+            current_config = mask->config2;
         } else {
             // Should be unreachable
             continue;
