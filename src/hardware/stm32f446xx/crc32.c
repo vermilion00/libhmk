@@ -14,19 +14,29 @@
  */
 
 #include "crc32.h"
+
 #include "hardware/board_api.h"
-#include "hardware/flash_api.h"
-#include "tusb.h"
+#include "stm32f4xx_hal.h"
 
-int main(void) {
-  board_init();
-  crc32_init();
-  flash_init();
+static CRC_HandleTypeDef crc_handle;
 
-  tud_init(BOARD_TUD_RHPORT);
+void crc32_init(void) {
+  __HAL_RCC_CRC_CLK_ENABLE();
 
-  while (1)
-    tud_task();
+  crc_handle.Instance = CRC;
+  if (HAL_CRC_Init(&crc_handle) != HAL_OK)
+    board_error_handler();
+}
 
-  return 0;
+uint32_t crc32_compute(const void *buf, uint32_t len, uint32_t crc) {
+  uint32_t k = 0;
+
+  HAL_CRC_Calculate(&crc_handle, &crc, 1);
+  crc = HAL_CRC_Accumulate(&crc_handle, (void *)buf, len >> 2);
+  if (len & 3) {
+    memcpy(&k, buf + (len & ~3), len & 3);
+    crc = HAL_CRC_Accumulate(&crc_handle, &k, 1);
+  }
+
+  return crc;
 }
