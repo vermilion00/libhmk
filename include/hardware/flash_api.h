@@ -31,7 +31,7 @@ void flash_init(void);
 /**
  * @brief Get the size of a flash sector
  *
- * @param sector The sector number
+ * @param sector Sector to get the size of
  *
  * @return The size of the sector in bytes, or 0 if invalid
  */
@@ -40,29 +40,29 @@ uint32_t flash_sector_size(uint32_t sector);
 /**
  * @brief Erase a flash sector
  *
- * @param sector The sector number
+ * @param sector Sector to erase
  *
  * @return true if successful, false otherwise
  */
 bool flash_erase(uint32_t sector);
 
 /**
- * @brief Write data to flash
+ * @brief Read data from flash
  *
- * @param addr The address to write to
- * @param buffer The data to write
- * @param len The length of the data in words (4 bytes)
+ * @param addr Address to read from
+ * @param buffer Buffer to read into
+ * @param len Length of the data in words (4 bytes)
  *
  * @return true if successful, false otherwise
  */
 bool flash_read(uint32_t addr, void *buf, uint32_t len);
 
 /**
- * @brief Read data from flash
+ * @brief Write data to flash
  *
- * @param addr The address to read from
- * @param buffer The buffer to read into
- * @param len The length of the data in words (4 bytes)
+ * @param addr Address to write to
+ * @param buf Buffer to write from
+ * @param len Length of the data in words (4 bytes)
  *
  * @return true if successful, false otherwise
  */

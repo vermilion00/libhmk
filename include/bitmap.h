@@ -32,17 +32,17 @@ typedef uint32_t bitmap_t;
  *
  * @param len Length of the bitmap in bits
  *
- * @return The bitmap
+ * @return Bitmap
  */
 #define MAKE_BITMAP(len) ((bitmap_t[M_DIV_CEIL(len, 32)]){0})
 
 /**
  * @brief Get the value of a bit in a bitmap
  *
- * @param bitmap The bitmap
- * @param i The index of the bit
+ * @param bitmap Bitmap
+ * @param i Index of the bit
  *
- * @return The value of the bit
+ * @return Value of the bit
  */
 __attribute__((always_inline)) static inline uint8_t
 bitmap_get(const bitmap_t *bitmap, uint32_t i) {
@@ -52,9 +52,9 @@ bitmap_get(const bitmap_t *bitmap, uint32_t i) {
 /**
  * @brief Set the value of a bit in a bitmap
  *
- * @param bitmap The bitmap
- * @param i The index of the bit
- * @param v The value to set the bit to
+ * @param bitmap Bitmap
+ * @param i Index of the bit
+ * @param v Value to set
  *
  * @return None
  */
@@ -66,8 +66,8 @@ bitmap_set(bitmap_t *bitmap, uint32_t i, uint8_t v) {
 /**
  * @brief Toggle the value of a bit in a bitmap
  *
- * @param bitmap The bitmap
- * @param i The index of the bit
+ * @param bitmap Bitmap
+ * @param i Index of the bit
  *
  * @return None
  */

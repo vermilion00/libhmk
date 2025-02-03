@@ -113,7 +113,7 @@ void board_error_handler(void) {
 
 void board_reset(void) { NVIC_SystemReset(); }
 
-uint32_t board_serial(uint16_t *buffer) {
+uint32_t board_serial(uint16_t *buf) {
   static char serial_str[24 + 1];
 
   // Use the 96-bit unique ID as the serial number
@@ -122,7 +122,7 @@ uint32_t board_serial(uint16_t *buffer) {
 
   // Convert ASCII string into UTF-16-LE
   for (size_t i = 0; i < 24; i++)
-    buffer[i] = serial_str[i];
+    buf[i] = serial_str[i];
 
   return 24;
 }

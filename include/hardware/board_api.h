@@ -56,8 +56,8 @@ void board_reset(void);
  * The serial number is a UTF-16-LE encoded string with a maximum length of 32
  * and no null terminator.
  *
- * @param buffer Buffer to store the serial number
+ * @param buf Buffer to store the serial number
  *
- * @return The number of characters written to the buffer
+ * @return Length of the serial number in characters
  */
-uint32_t board_serial(uint16_t *buffer);
+uint32_t board_serial(uint16_t *buf);
