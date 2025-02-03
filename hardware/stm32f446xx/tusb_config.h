@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "board.h"
+#include "common.h"
 
 // STM32F446xx
 #define CFG_TUSB_MCU OPT_MCU_STM32F4

@@ -13,18 +13,17 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "hardware/board_api.h"
-#include "hardware/flash_api.h"
-#include "tusb.h"
+#pragma once
 
-int main(void) {
-  board_init();
-  flash_init();
+#include "common.h"
 
-  tud_init(BOARD_TUD_RHPORT);
+//--------------------------------------------------------------------+
+// Flash Definitions
+//--------------------------------------------------------------------+
 
-  while (1)
-    tud_task();
-
-  return 0;
-}
+// Flash size in bytes
+#define FLASH_SIZE (512 * 1024)
+// Number of flash sectors/pages
+#define FLASH_NUM_SECTORS 8
+// Flash value when erased
+#define FLASH_EMPTY_VAL 0xFFFFFFFF

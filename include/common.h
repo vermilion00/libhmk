@@ -25,7 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "board.h"
+#include "board_def.h"
+#include "config.h"
 
 //--------------------------------------------------------------------+
 // Common Macros
