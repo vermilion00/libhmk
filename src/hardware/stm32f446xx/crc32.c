@@ -15,7 +15,7 @@
 
 #include "crc32.h"
 
-#include "hardware/board_api.h"
+#include "hardware/hardware.h"
 #include "stm32f4xx_hal.h"
 
 static CRC_HandleTypeDef crc_handle;

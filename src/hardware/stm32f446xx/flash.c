@@ -13,7 +13,7 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "hardware/flash_api.h"
+#include "hardware/hardware.h"
 
 #include "stm32f4xx_hal.h"
 
@@ -36,6 +36,7 @@ bool flash_erase(uint32_t sector) {
     return false;
 
   FLASH_EraseInitTypeDef erase = {0};
+  uint32_t error = 0;
   bool success = true;
 
   HAL_FLASH_Unlock();
@@ -44,7 +45,7 @@ bool flash_erase(uint32_t sector) {
   erase.Sector = sector;
   erase.NbSectors = 1;
   erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-  success = (HAL_FLASHEx_Erase(&erase, NULL) == HAL_OK);
+  success = (HAL_FLASHEx_Erase(&erase, &error) == HAL_OK);
   HAL_FLASH_Lock();
 
   return success;

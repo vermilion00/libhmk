@@ -13,22 +13,13 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "crc32.h"
-#include "hardware/hardware.h"
-#include "tusb.h"
-#include "wear_leveling.h"
+#pragma once
 
-int main(void) {
-  board_init();
+#include "common.h"
 
-  crc32_init();
-  flash_init();
-  wear_leveling_init();
+//--------------------------------------------------------------------+
+// Hardware Headers
+//--------------------------------------------------------------------+
 
-  tud_init(BOARD_TUD_RHPORT);
-
-  while (1)
-    tud_task();
-
-  return 0;
-}
+#include "hardware/board_api.h"
+#include "hardware/flash_api.h"

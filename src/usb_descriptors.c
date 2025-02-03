@@ -15,7 +15,7 @@
 
 #include "usb_descriptors.h"
 
-#include "hardware/board_api.h"
+#include "hardware/hardware.h"
 #include "tusb.h"
 #include "vendor.h"
 
