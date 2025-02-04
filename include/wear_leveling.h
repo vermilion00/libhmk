@@ -102,3 +102,14 @@ bool wear_leveling_erase(void);
  * @return true if the read was successful, false otherwise
  */
 bool wear_leveling_read(uint32_t addr, void *buf, uint32_t len);
+
+/**
+ * @brief Write data to the virtual storage
+ *
+ * @param addr Address to write to
+ * @param buf Buffer to write from
+ * @param len Length of the data in bytes
+ *
+ * @return true if the write was successful, false otherwise
+ */
+bool wear_leveling_write(uint32_t addr, const void *buf, uint32_t len);

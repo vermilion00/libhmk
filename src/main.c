@@ -14,6 +14,7 @@
  */
 
 #include "crc32.h"
+#include "eeconfig.h"
 #include "hardware/hardware.h"
 #include "tusb.h"
 #include "wear_leveling.h"
@@ -24,6 +25,7 @@ int main(void) {
   crc32_init();
   flash_init();
   wear_leveling_init();
+  eeconfig_init();
 
   tud_init(BOARD_TUD_RHPORT);
 
