@@ -35,10 +35,13 @@ static void board_clock_init(void) {
   rcc_osc_init.PLL.PLLState = RCC_PLL_ON;
   rcc_osc_init.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   rcc_osc_init.PLL.PLLM = BOARD_HSE_VALUE / 1000000;
-  rcc_osc_init.PLL.PLLN = 336;
+  rcc_osc_init.PLL.PLLN = 360;
   rcc_osc_init.PLL.PLLP = RCC_PLLP_DIV2;
-  rcc_osc_init.PLL.PLLQ = 7;
+  rcc_osc_init.PLL.PLLQ = 2;
   if (HAL_RCC_OscConfig(&rcc_osc_init) != HAL_OK)
+    board_error_handler();
+
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
     board_error_handler();
 
   rcc_clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
@@ -57,7 +60,18 @@ static void board_clock_init(void) {
  * @return None
  */
 static void board_usb_init(void) {
+  RCC_PeriphCLKInitTypeDef rcc_periph_clk_init = {0};
   GPIO_InitTypeDef gpio_init = {0};
+
+  rcc_periph_clk_init.PeriphClockSelection = RCC_PERIPHCLK_CLK48;
+  rcc_periph_clk_init.PLLSAI.PLLSAIM = 16;
+  rcc_periph_clk_init.PLLSAI.PLLSAIN = 192;
+  rcc_periph_clk_init.PLLSAI.PLLSAIQ = 2;
+  rcc_periph_clk_init.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV4;
+  rcc_periph_clk_init.PLLSAIDivQ = 1;
+  rcc_periph_clk_init.Clk48ClockSelection = RCC_CLK48CLKSOURCE_PLLSAIP;
+  if (HAL_RCCEx_PeriphCLKConfig(&rcc_periph_clk_init) != HAL_OK)
+    board_error_handler();
 
 #if defined(BOARD_USB_FS)
   __HAL_RCC_GPIOA_CLK_ENABLE();
