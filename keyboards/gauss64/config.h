@@ -33,6 +33,25 @@
 #define USB_PRODUCT_ID 0xAB01
 
 //--------------------------------------------------------------------+
+// Analog Configuration
+//--------------------------------------------------------------------+
+
+#define ADC_NUM_MUX_INPUTS 4
+#define ADC_MUX_INPUT_CHANNELS {0, 1, 2, 3}
+
+// CD74HC4067 16-Channel Analog Multiplexer
+#define ADC_NUM_MUX_SELECT_PINS 4
+#define ADC_MUX_SELECT_PORTS {GPIOA, GPIOC, GPIOC, GPIOB}
+#define ADC_MUX_SELECT_PINS {GPIO_PIN_7, GPIO_PIN_4, GPIO_PIN_5, GPIO_PIN_0}
+#define ADC_MUX_INPUT_MATRIX                                                   \
+  {                                                                            \
+      {63, 51, 47, 57}, {54, 37, 33, 58}, {55, 52, 48, 44}, {40, 38, 34, 59},  \
+      {41, 24, 20, 2},  {13, 10, 6, 1},   {27, 9, 5, 16},   {26, 23, 19, 30},  \
+      {12, 8, 4, 15},   {11, 22, 18, 29}, {25, 7, 3, 0},    {60, 21, 17, 14},  \
+      {61, 35, 31, 28}, {62, 49, 45, 56}, {53, 50, 46, 42}, {39, 36, 32, 43},  \
+  }
+
+//--------------------------------------------------------------------+
 // Keyboard Configuration
 //--------------------------------------------------------------------+
 

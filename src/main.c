@@ -27,10 +27,15 @@ int main(void) {
   wear_leveling_init();
   eeconfig_init();
 
+  analog_init();
+
   tud_init(BOARD_TUD_RHPORT);
 
-  while (1)
+  while (1) {
     tud_task();
+
+    analog_task();
+  }
 
   return 0;
 }

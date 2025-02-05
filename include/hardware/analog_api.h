@@ -18,19 +18,36 @@
 #include "common.h"
 
 //--------------------------------------------------------------------+
-// Flash Configuration
+// Analog API
 //--------------------------------------------------------------------+
 
-// Flash size in bytes
-#define FLASH_SIZE (512 * 1024)
-// Number of flash sectors/pages
-#define FLASH_NUM_SECTORS 8
-// Flash value when erased
-#define FLASH_EMPTY_VAL 0xFFFFFFFF
+/**
+ * @brief Initialize the analog module
+ *
+ * This function should initialize the ADC peripheral and any other peripherals
+ * needed to scan the keys. In a non-blocking implementation, this function
+ * can be used to start the ADC conversion loop.
+ *
+ * @return None
+ */
+void analog_init(void);
 
-//--------------------------------------------------------------------+
-// ADC Configuration
-//--------------------------------------------------------------------+
+/**
+ * @brief Analog task
+ *
+ * This function will be called before reading the ADC values. In a blocking
+ * implementation, this function can be used to start and wait for the ADC
+ * conversion to complete.
+ *
+ * @return None
+ */
+void analog_task(void);
 
-// Number of ADC channels
-#define ADC_NUM_CHANNELS 16
+/**
+ * @brief Read the raw ADC value of the specified key
+ *
+ * @param key Key index
+ *
+ * @return Raw ADC value
+ */
+uint16_t analog_read(uint8_t key);

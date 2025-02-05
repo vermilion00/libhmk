@@ -76,9 +76,9 @@ _Static_assert(1 <= NUM_ADVANCED_KEYS && NUM_ADVANCED_KEYS <= 256,
 // Keyboard Types
 //--------------------------------------------------------------------+
 
-// Actuation configuration for a key. If rt_down is non-zero, Rapid Trigger is
-// enabled. If rt_up is non-zero, both rt_down and rt_up are used to configure
-// the Rapid Trigger press and release sensitivity, respectively.
+// Actuation configuration for a key. If `rt_down` is non-zero, Rapid Trigger is
+// enabled. If `rt_up` is non-zero, both `rt_down` and `rt_up` are used to
+// configure the Rapid Trigger press and release sensitivity, respectively.
 typedef struct __attribute__((packed)) {
   // Actuation point (0-255)
   uint8_t actuation_point;
