@@ -13,30 +13,10 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "crc32.h"
-#include "eeconfig.h"
 #include "hardware/hardware.h"
-#include "tusb.h"
-#include "wear_leveling.h"
 
-int main(void) {
-  board_init();
+#include "stm32f4xx_hal.h"
 
-  crc32_init();
-  flash_init();
-  wear_leveling_init();
-  eeconfig_init();
+void timer_init(void) {}
 
-  analog_init();
-  timer_init();
-
-  tud_init(BOARD_TUD_RHPORT);
-
-  while (1) {
-    tud_task();
-
-    analog_task();
-  }
-
-  return 0;
-}
+uint32_t timer_read(void) { return HAL_GetTick(); }
