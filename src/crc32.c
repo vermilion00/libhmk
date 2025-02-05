@@ -37,7 +37,7 @@ __attribute__((weak)) uint32_t crc32_compute(const void *buf, uint32_t len,
   crc = ~crc;
   for (uint32_t i = len >> 2; i; i--) {
     memcpy(&k, buf8, sizeof(k));
-    buf += sizeof(k);
+    buf8 += sizeof(k);
     crc = crc32_update(crc, k);
   }
 
