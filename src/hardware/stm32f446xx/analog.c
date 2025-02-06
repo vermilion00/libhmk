@@ -57,8 +57,9 @@ _Static_assert(M_ARRAY_SIZE(mux_select_pins) == ADC_NUM_MUX_SELECT_PINS,
                "Invalid number of multiplexer select pins");
 
 // Matrix containing the key index for each multiplexer input channel and each
-// ADC channel
-static const uint8_t mux_input_matrix[][ADC_NUM_MUX_INPUTS] =
+// ADC channel. If the value is at least `NUM_KEYS`, the corresponding key is
+// not connected.
+static const uint16_t mux_input_matrix[][ADC_NUM_MUX_INPUTS] =
     ADC_MUX_INPUT_MATRIX;
 
 _Static_assert(M_ARRAY_SIZE(mux_input_matrix) == (1 << ADC_NUM_MUX_SELECT_PINS),
@@ -72,8 +73,9 @@ static const uint8_t raw_input_channels[] = ADC_RAW_INPUT_CHANNELS;
 _Static_assert(M_ARRAY_SIZE(raw_input_channels) == ADC_NUM_RAW_INPUTS,
                "Invalid number of ADC raw inputs");
 
-// Vector containing the key index for each raw input channel
-static const uint8_t raw_input_vector[] = ADC_RAW_INPUT_VECTOR;
+// Vector containing the key index for each raw input channel. If the value is
+// at least `NUM_KEYS`, the corresponding key is not connected.
+static const uint16_t raw_input_vector[] = ADC_RAW_INPUT_VECTOR;
 
 _Static_assert(M_ARRAY_SIZE(raw_input_vector) == ADC_NUM_RAW_INPUTS,
                "Invalid number of ADC raw inputs");
@@ -239,13 +241,19 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
   if (hadc == &adc_handle) {
 #if ADC_NUM_MUX_INPUTS > 0
-    for (uint32_t i = 0; i < ADC_NUM_MUX_INPUTS; i++)
-      adc_values[mux_input_matrix[current_mux_channel][i]] = adc_buffer[i];
+    for (uint32_t i = 0; i < ADC_NUM_MUX_INPUTS; i++) {
+      const uint16_t key = mux_input_matrix[current_mux_channel][i];
+      if (key < NUM_KEYS)
+        adc_values[key] = adc_buffer[i];
+    }
 #endif
 
 #if ADC_NUM_RAW_INPUTS > 0
-    for (uint32_t i = 0; i < ADC_NUM_RAW_INPUTS; i++)
-      adc_values[raw_input_vector[i]] = adc_buffer[ADC_NUM_MUX_INPUTS + i];
+    for (uint32_t i = 0; i < ADC_NUM_RAW_INPUTS; i++) {
+      const uint16_t key = raw_input_vector[i];
+      if (key < NUM_KEYS)
+        adc_values[key] = adc_buffer[ADC_NUM_MUX_INPUTS + i];
+    }
 #endif
 
 #if ADC_NUM_MUX_INPUTS > 0

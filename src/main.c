@@ -16,19 +16,21 @@
 #include "crc32.h"
 #include "eeconfig.h"
 #include "hardware/hardware.h"
+#include "matrix.h"
 #include "tusb.h"
 #include "wear_leveling.h"
 
 int main(void) {
   board_init();
-
+  timer_init();
   crc32_init();
   flash_init();
+
   wear_leveling_init();
   eeconfig_init();
 
   analog_init();
-  timer_init();
+  matrix_init();
 
   tud_init(BOARD_TUD_RHPORT);
 
@@ -36,6 +38,7 @@ int main(void) {
     tud_task();
 
     analog_task();
+    matrix_scan();
   }
 
   return 0;

@@ -52,6 +52,18 @@
   }
 
 //--------------------------------------------------------------------+
+// Key Matrix Configuration
+//--------------------------------------------------------------------+
+
+// The raw ADC values are not directly proportional to the travel distance of
+// the keys so we must invert the values.
+#define MATRIX_INVERT_ADC_VALUES
+
+// Approximated by measuring the actual values of GEON Raw HE switches
+#define MATRIX_INITIAL_REST_VALUE 2300
+#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 650
+
+//--------------------------------------------------------------------+
 // Keyboard Configuration
 //--------------------------------------------------------------------+
 

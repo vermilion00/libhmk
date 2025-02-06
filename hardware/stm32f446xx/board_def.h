@@ -34,3 +34,16 @@
 
 // Number of ADC channels
 #define ADC_NUM_CHANNELS 16
+
+#if !defined(ADC_RESOLUTION)
+// ADC resolution in bits
+#define ADC_RESOLUTION 12
+#endif
+
+// Maximum ADC value
+#define ADC_MAX_VALUE ((1 << ADC_RESOLUTION) - 1)
+
+#if !defined(ADC_NUM_SAMPLE_CYCLES)
+// Number of sample cycles for each ADC conversion
+#define ADC_NUM_SAMPLE_CYCLES 3
+#endif

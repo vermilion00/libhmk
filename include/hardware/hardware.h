@@ -24,3 +24,4 @@
 #include "hardware/analog_api.h"
 #include "hardware/board_api.h"
 #include "hardware/flash_api.h"
+#include "hardware/timer_api.h"
