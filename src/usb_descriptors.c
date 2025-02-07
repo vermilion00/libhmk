@@ -316,7 +316,7 @@ const uint8_t *tud_descriptor_device_cb(void) {
 }
 
 const uint8_t *tud_hid_descriptor_report_cb(uint8_t instance) {
-  return instance == 0 ? desc_keyboard_report : desc_hid_report;
+  return instance == USB_ITF_KEYBOARD ? desc_keyboard_report : desc_hid_report;
 }
 
 const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {

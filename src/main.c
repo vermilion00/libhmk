@@ -16,21 +16,26 @@
 #include "crc32.h"
 #include "eeconfig.h"
 #include "hardware/hardware.h"
+#include "hid.h"
 #include "matrix.h"
 #include "tusb.h"
 #include "wear_leveling.h"
 
 int main(void) {
+  // Initialize the hardware
   board_init();
   timer_init();
   crc32_init();
   flash_init();
 
+  // Initialize the persistent configuration
   wear_leveling_init();
   eeconfig_init();
 
+  // Initialize the core modules
   analog_init();
   matrix_init();
+  hid_init();
 
   tud_init(BOARD_TUD_RHPORT);
 

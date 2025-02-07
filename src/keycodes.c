@@ -17,7 +17,7 @@
 
 #include "tusb.h"
 
-const uint16_t keycode_to_hid[] = {
+const uint16_t keycode_to_hid[256] = {
     [KC_NO] = 0,
     [KC_TRANSPARENT] = 0,
 
