@@ -14,6 +14,7 @@
  */
 
 #include "crc32.h"
+#include "deferred_actions.h"
 #include "eeconfig.h"
 #include "hardware/hardware.h"
 #include "hid.h"
@@ -37,6 +38,7 @@ int main(void) {
   analog_init();
   matrix_init();
   hid_init();
+  deferred_action_init();
   layout_init();
 
   tud_init(BOARD_TUD_RHPORT);

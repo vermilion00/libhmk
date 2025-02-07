@@ -18,35 +18,6 @@
 #include "common.h"
 
 //--------------------------------------------------------------------+
-// Deferred Actions
-//--------------------------------------------------------------------+
-
-#if !defined(HID_MAX_DEFERRED_ACTIONS)
-// Maximum number of deferred actions for each HID interface
-#define HID_MAX_DEFERRED_ACTIONS 16
-#endif
-
-// Deferred action type
-typedef enum {
-  DEFERRED_ACTION_TYPE_PRESS = 0,
-  DEFERRED_ACTION_TYPE_RELEASE,
-  DEFERRED_ACTION_TYPE_TAP,
-  DEFERRED_ACTION_COUNT,
-} hid_deferred_action_type_t;
-
-// Deferred action. This action will be executed after the final report of the
-// current matrix scan is sent. This is useful for tapping keys, where the key
-// should be immediately released after the report is sent.
-typedef struct {
-  // Action to perform
-  uint8_t type;
-  // Key to perform the action on
-  uint8_t key;
-  // Keycode associated with the action
-  uint8_t keycode;
-} hid_deferred_action_t;
-
-//--------------------------------------------------------------------+
 // HID API
 //--------------------------------------------------------------------+
 

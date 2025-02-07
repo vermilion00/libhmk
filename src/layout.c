@@ -16,6 +16,7 @@
 #include "layout.h"
 
 #include "bitmap.h"
+#include "deferred_actions.h"
 #include "eeconfig.h"
 #include "hid.h"
 #include "keycodes.h"
@@ -24,16 +25,6 @@
 // Layer mask. Each bit represents whether a layer is active or not.
 static uint16_t layer_mask;
 static uint8_t default_layer;
-
-// Whether the key is disabled by `SP_KEY_LOCK`
-static bitmap_t key_disabled[] = MAKE_BITMAP(NUM_KEYS);
-// Track whether the key is currently pressed. Used to detect key events.
-static bitmap_t key_press_states[] = MAKE_BITMAP(NUM_KEYS);
-// Store the keycodes of the currently pressed keys. Layer/profile may change so
-// we need to remember the keycodes we pressed to release them correctly.
-static uint8_t active_keycodes[NUM_KEYS];
-// Only send reports if they changed
-bool should_send_reports;
 
 /**
  * @brief Get the current layer
@@ -79,6 +70,17 @@ static uint8_t layout_get_keycode(uint8_t current_layer, uint8_t key) {
   return CURRENT_PROFILE.keymap[default_layer][key];
 }
 
+// Only send reports if they changed
+static bool should_send_reports;
+// Whether the key is disabled by `SP_KEY_LOCK`
+static bitmap_t key_disabled[] = MAKE_BITMAP(NUM_KEYS);
+
+// Track whether the key is currently pressed. Used to detect key events.
+static bitmap_t key_press_states[] = MAKE_BITMAP(NUM_KEYS);
+// Store the keycodes of the currently pressed keys. Layer/profile may change so
+// we need to remember the keycodes we pressed to release them correctly.
+static uint8_t active_keycodes[NUM_KEYS];
+
 void layout_init(void) {}
 
 void layout_task(void) {
@@ -116,6 +118,9 @@ void layout_task(void) {
     hid_send_reports();
     should_send_reports = false;
   }
+
+  // Process deferred actions for the next matrix scan
+  deferred_action_process();
 }
 
 void layout_ll_press(uint8_t key, uint8_t keycode) {
