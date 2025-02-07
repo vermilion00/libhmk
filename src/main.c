@@ -17,6 +17,7 @@
 #include "eeconfig.h"
 #include "hardware/hardware.h"
 #include "hid.h"
+#include "layout.h"
 #include "matrix.h"
 #include "tusb.h"
 #include "wear_leveling.h"
@@ -36,6 +37,7 @@ int main(void) {
   analog_init();
   matrix_init();
   hid_init();
+  layout_init();
 
   tud_init(BOARD_TUD_RHPORT);
 
@@ -44,6 +46,7 @@ int main(void) {
 
     analog_task();
     matrix_scan();
+    layout_task();
   }
 
   return 0;
