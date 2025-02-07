@@ -197,7 +197,7 @@ static wear_leveling_status_t wear_leveling_replay_log(void) {
 }
 
 static wear_leveling_status_t wear_leveling_append(uint32_t value) {
-  // Append the value to the write logks
+  // Append the value to the write log
   if (!wear_leveling_flash_write(write_address, &value, 1))
     return WL_STATUS_FAILED;
   write_address += 4;
