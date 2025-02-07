@@ -46,7 +46,7 @@ typedef uint32_t bitmap_t;
  */
 __attribute__((always_inline)) static inline uint8_t
 bitmap_get(const bitmap_t *bitmap, uint32_t i) {
-  return (bitmap[i / 32] >> (i & 31)) >> 1;
+  return (bitmap[i / 32] >> (i & 31)) & 1;
 }
 
 /**
