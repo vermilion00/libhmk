@@ -49,11 +49,31 @@ layout_layer_off(uint8_t layer) {
   layer_mask &= ~(1 << layer);
 }
 
+/**
+ * @brief Lock the current layer
+ *
+ * This function sets the default layer to the current layer if it is not
+ * already set. Otherwise, it sets the default layer to 0.
+ *
+ * @return None
+ */
 __attribute__((always_inline)) static inline void layout_layer_lock(void) {
   const uint8_t current_layer = layout_get_current_layer();
   default_layer = current_layer == default_layer ? 0 : current_layer;
 }
 
+/**
+ * @brief Get the keycode of a key
+ *
+ * This function returns the keycode of a key in the current layer. If the key
+ * is transparent, the function will search for the highest active layer with a
+ * non-transparent keycode.
+ *
+ * @param current_layer Current layer
+ * @param key Key index
+ *
+ * @return Keycode
+ */
 static uint8_t layout_get_keycode(uint8_t current_layer, uint8_t key) {
   // Find the first active layer with a non-transparent keycode
   for (uint32_t i = current_layer + 1; i-- > 0;) {
@@ -62,7 +82,7 @@ static uint8_t layout_get_keycode(uint8_t current_layer, uint8_t key) {
       continue;
 
     const uint8_t keycode = CURRENT_PROFILE.keymap[i][key];
-    if (keycode != KC_TRNS)
+    if (keycode != KC_TRANSPARENT)
       return keycode;
   }
 
