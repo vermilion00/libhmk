@@ -26,6 +26,12 @@
 #define VENDOR_WEBUSB_URL_SCHEME 1
 #endif
 
+#if !defined(VENDOR_BUFFER_SIZE)
+// Buffer for receiving vendor data. This should be large enough to hold the
+// largest data that can be received from the host.
+#define VENDOR_BUFFER_SIZE 4096
+#endif
+
 //--------------------------------------------------------------------+
 // Vendor Requests
 //--------------------------------------------------------------------+
@@ -37,3 +43,31 @@ enum {
   VENDOR_REQUEST_MICROSOFT,
   VENDOR_REQUEST_COUNT,
 };
+
+//--------------------------------------------------------------------+
+// Class Requests
+//--------------------------------------------------------------------+
+
+// WebUSB class request
+typedef enum {
+  CLASS_REQUEST_FIRMWARE_VERSION = 0,
+  CLASS_REQUEST_REBOOT,
+  CLASS_REQUEST_BOOTLOADER,
+  CLASS_REQUEST_FACTORY_RESET,
+  CLASS_REQUEST_RECALIBRATE,
+  CLASS_REQUEST_DEBUG,
+  CLASS_REQUEST_GET_PROFILE,
+  // Requests below use `wValue` to specify the profile number
+  CLASS_REQUEST_GET_KEYMAP,
+  CLASS_REQUEST_SET_KEYMAP,
+  CLASS_REQUEST_GET_ACTUATION_MAP,
+  CLASS_REQUEST_SET_ACTUATION_MAP,
+  CLASS_REQUEST_GET_ADVANCED_KEYS,
+  CLASS_REQUEST_SET_ADVANCED_KEYS,
+} class_request_t;
+
+// `CLASS_REQUEST_DEBUG` payload for each key
+typedef struct __attribute__((packed)) {
+  uint16_t adc_value;
+  uint8_t distance;
+} class_res_debug_t;

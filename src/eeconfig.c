@@ -65,21 +65,21 @@ bool eeconfig_set_current_profile(uint8_t profile) {
   return status;
 }
 
-bool eeconfig_update_keymap(uint8_t profile, const void *keymap) {
+bool eeconfig_set_keymap(uint8_t profile, const void *keymap) {
   if (profile >= NUM_PROFILES)
     return false;
 
   return EECONFIG_UPDATE(profiles[profile].keymap, keymap);
 }
 
-bool eeconfig_update_actuation_map(uint8_t profile, const void *actuation_map) {
+bool eeconfig_set_actuation_map(uint8_t profile, const void *actuation_map) {
   if (profile >= NUM_PROFILES)
     return false;
 
   return EECONFIG_UPDATE(profiles[profile].actuation_map, actuation_map);
 }
 
-bool eeconfig_update_advanced_key(uint8_t profile, const void *advanced_key) {
+bool eeconfig_set_advanced_keys(uint8_t profile, const void *advanced_key) {
   if (profile >= NUM_PROFILES)
     return false;
 
