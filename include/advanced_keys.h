@@ -18,6 +18,18 @@
 #include "common.h"
 
 //--------------------------------------------------------------------+
+// Null Bind State
+//--------------------------------------------------------------------+
+
+// Null Bind state
+typedef struct {
+  // Whether the primary and secondary keys are registered
+  bool is_pressed[2];
+  // Active keycodes of the primary and secondary keys
+  uint8_t keycodes[2];
+} ak_state_null_bind_t;
+
+//--------------------------------------------------------------------+
 // Tap-Hold State
 //--------------------------------------------------------------------+
 
@@ -63,6 +75,7 @@ typedef struct {
 
 // Advanced key state
 typedef union {
+  ak_state_null_bind_t null_bind;
   ak_state_tap_hold_t tap_hold;
   ak_state_toggle_t toggle;
 } advanced_key_state_t;

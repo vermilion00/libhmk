@@ -20,8 +20,89 @@
 #include "hardware/hardware.h"
 #include "keycodes.h"
 #include "layout.h"
+#include "matrix.h"
 
 static advanced_key_state_t ak_states[NUM_ADVANCED_KEYS];
+
+static void advanced_key_null_bind(const advanced_key_event_t *event) {
+  const null_bind_t *null_bind =
+      &CURRENT_PROFILE.advanced_keys[event->ak_index].null_bind;
+  ak_state_null_bind_t *state = &ak_states[event->ak_index].null_bind;
+
+  const uint8_t keys[] = {
+      CURRENT_PROFILE.advanced_keys[event->ak_index].key,
+      null_bind->secondary_key,
+  };
+  const uint8_t index = event->key == keys[0] ? 0 : 1;
+
+  // Update the active keycodes
+  switch (event->type) {
+  case AK_EVENT_TYPE_PRESS:
+    state->keycodes[index] = event->keycode;
+    break;
+
+  case AK_EVENT_TYPE_RELEASE:
+    if (state->is_pressed[index]) {
+      // Also release the key if it is registered
+      layout_ll_release(keys[index], state->keycodes[index]);
+      state->is_pressed[index] = false;
+    }
+    state->keycodes[index] = KC_NO;
+    break;
+
+  default:
+    break;
+  }
+
+  bool is_pressed[] = {
+      state->keycodes[0] != KC_NO,
+      state->keycodes[1] != KC_NO,
+  };
+  if (is_pressed[0] & is_pressed[1]) {
+    // Both keys are pressed so we perform the Null Bind resolution.
+    if ((null_bind->bottom_out_point > 0) &&
+        ((key_matrix[keys[0]].distance >= null_bind->bottom_out_point) &
+         (key_matrix[keys[1]].distance >= null_bind->bottom_out_point)))
+      // Input on both bottom out is enabled and both keys are bottomed out so
+      // we register both keys.
+      is_pressed[0] = is_pressed[1] = true;
+    else if (null_bind->behavior == NB_BEHAVIOR_DISTANCE) {
+      // Always compare the distance, regardless of the event type. If there is
+      // a tie between the travel distances, the last pressed key is
+      // prioritized.
+      is_pressed[index] = key_matrix[keys[index]].distance >=
+                          key_matrix[keys[index ^ 1]].distance;
+      is_pressed[index ^ 1] = !is_pressed[index];
+    } else if (event->type == AK_EVENT_TYPE_PRESS) {
+      // Other behaviors only require comparison on press events.
+      is_pressed[index] =
+          (null_bind->behavior != NB_BEHAVIOR_NEUTRAL) &
+          ((null_bind->behavior == NB_BEHAVIOR_LAST) |
+           ((null_bind->behavior == NB_BEHAVIOR_PRIMARY) & (index == 0)) |
+           ((null_bind->behavior == NB_BEHAVIOR_SECONDARY) & (index == 1)));
+      // Only one key can be registered at a time except for the
+      // `NB_BEHAVIOR_NEUTRAL`.
+      is_pressed[index ^ 1] =
+          (null_bind->behavior != NB_BEHAVIOR_NEUTRAL) & !is_pressed[index];
+    } else {
+      // No action is required for other event types.
+      is_pressed[0] = state->is_pressed[0];
+      is_pressed[1] = state->is_pressed[1];
+    }
+  }
+
+  // Update the key states. The only changes here are the results of the Null
+  // Bind resolution.
+  for (uint32_t i = 0; i < 2; i++) {
+    if (is_pressed[i] & !state->is_pressed[i]) {
+      layout_ll_press(keys[i], state->keycodes[i]);
+      state->is_pressed[i] = true;
+    } else if (!is_pressed[i] & state->is_pressed[i]) {
+      layout_ll_release(keys[i], state->keycodes[i]);
+      state->is_pressed[i] = false;
+    }
+  }
+}
 
 static void advanced_key_tap_hold(const advanced_key_event_t *event) {
   static deferred_action_t tap_release = {0};
@@ -117,6 +198,10 @@ void advanced_key_process(const advanced_key_event_t *event) {
     return;
 
   switch (CURRENT_PROFILE.advanced_keys[event->ak_index].type) {
+  case AK_TYPE_NULL_BIND:
+    advanced_key_null_bind(event);
+    break;
+
   case AK_TYPE_TAP_HOLD:
     advanced_key_tap_hold(event);
     break;
