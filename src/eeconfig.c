@@ -15,7 +15,14 @@
 
 #include "eeconfig.h"
 
+#include "advanced_keys.h"
 #include "keycodes.h"
+#include "layout.h"
+
+// Helper macro to update a field in the configuration
+#define EECONFIG_UPDATE(field, value)                                          \
+  wear_leveling_write(offsetof(eeconfig_t, field), value,                      \
+                      sizeof(((eeconfig_t *)0)->field))
 
 const eeconfig_t *eeconfig;
 
@@ -37,5 +44,54 @@ void eeconfig_init(void) {
 }
 
 bool eeconfig_reset(void) {
-  return wear_leveling_write(0, &default_eeconfig, sizeof(default_eeconfig));
+  advanced_key_clear();
+  const bool status =
+      wear_leveling_write(0, &default_eeconfig, sizeof(default_eeconfig));
+  layout_load_advanced_keys();
+
+  return status;
+}
+
+bool eeconfig_set_current_profile(uint8_t profile) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  advanced_key_clear();
+  bool status = EECONFIG_UPDATE(current_profile, &profile);
+  if (status && profile != 0)
+    status = EECONFIG_UPDATE(last_non_default_profile, &profile);
+  layout_load_advanced_keys();
+
+  return status;
+}
+
+bool eeconfig_update_keymap(uint8_t profile, const void *keymap) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  return EECONFIG_UPDATE(profiles[profile].keymap, keymap);
+}
+
+bool eeconfig_update_actuation_map(uint8_t profile, const void *actuation_map) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  return EECONFIG_UPDATE(profiles[profile].actuation_map, actuation_map);
+}
+
+bool eeconfig_update_advanced_key(uint8_t profile, const void *advanced_key) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  if (eeconfig->current_profile == profile)
+    // We only need to clear the advanced keys if the advanced keys in
+    // the current profile are being updated.
+    advanced_key_clear();
+  const bool status =
+      EECONFIG_UPDATE(profiles[profile].advanced_keys, advanced_key);
+  if (eeconfig->current_profile == profile)
+    // Same as above
+    layout_load_advanced_keys();
+
+  return status;
 }

@@ -79,3 +79,42 @@ void eeconfig_init(void);
  * @return true if successful, false otherwise
  */
 bool eeconfig_reset(void);
+
+/**
+ * @brief Set the current profile
+ *
+ * @param profile Profile index
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_current_profile(uint8_t profile);
+
+/**
+ * @brief Set the keymap for a profile
+ *
+ * @param profile Profile index
+ * @param keymap New keymap
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_keymap(uint8_t profile, const void *keymap);
+
+/**
+ * @brief Set the actuation map for a profile
+ *
+ * @param profile Profile index
+ * @param actuation_map New actuation map
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_actuation_map(uint8_t profile, const void *actuation_map);
+
+/**
+ * @brief Set the advanced keys for a profile
+ *
+ * @param profile Profile index
+ * @param advanced_keys New advanced keys
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_advanced_keys(uint8_t profile, const void *advanced_keys);

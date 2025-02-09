@@ -234,7 +234,7 @@ void layout_ll_press(uint8_t key, uint8_t keycode) {
     break;
 
   case PROFILE_RANGE:
-    // TODO: Implement profile switching
+    eeconfig_set_current_profile(PF_GET_PROFILE(keycode));
     break;
 
   case SP_KEY_LOCK:
@@ -246,11 +246,13 @@ void layout_ll_press(uint8_t key, uint8_t keycode) {
     break;
 
   case SP_PROFILE_SWAP:
-    // TODO: Implement profile swapping
+    eeconfig_set_current_profile(
+        eeconfig->current_profile ? 0 : eeconfig->last_non_default_profile);
     break;
 
   case SP_PROFILE_NEXT:
-    // TODO: Implement profile switching
+    eeconfig_set_current_profile((eeconfig->current_profile + 1) %
+                                 NUM_PROFILES);
     break;
 
   default:
