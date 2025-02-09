@@ -53,7 +53,7 @@ void layout_task(void);
  *
  * @return None
  */
-void layout_ll_press(uint8_t key, uint8_t keycode);
+void layout_register(uint8_t key, uint8_t keycode);
 
 /**
  * @brief Manually register a key release
@@ -63,4 +63,4 @@ void layout_ll_press(uint8_t key, uint8_t keycode);
  *
  * @return None
  */
-void layout_ll_release(uint8_t key, uint8_t keycode);
+void layout_unregister(uint8_t key, uint8_t keycode);

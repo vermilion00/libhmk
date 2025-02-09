@@ -161,7 +161,7 @@ void layout_task(void) {
              AK_TYPE_TAP_HOLD);
       } else {
         active_keycodes[i] = keycode;
-        layout_ll_press(i, keycode);
+        layout_register(i, keycode);
         has_non_tap_hold_press |= (keycode != KC_NO);
       }
     } else if (!k->is_pressed & last_key_press) {
@@ -180,7 +180,7 @@ void layout_task(void) {
         advanced_key_process(&ak_event);
       } else {
         active_keycodes[i] = KC_NO;
-        layout_ll_release(i, keycode);
+        layout_unregister(i, keycode);
       }
     } else if (k->is_pressed) {
       // Key hold event
@@ -219,7 +219,7 @@ void layout_task(void) {
   deferred_action_process();
 }
 
-void layout_ll_press(uint8_t key, uint8_t keycode) {
+void layout_register(uint8_t key, uint8_t keycode) {
   if (keycode == KC_NO)
     return;
 
@@ -260,7 +260,7 @@ void layout_ll_press(uint8_t key, uint8_t keycode) {
   }
 }
 
-void layout_ll_release(uint8_t key, uint8_t keycode) {
+void layout_unregister(uint8_t key, uint8_t keycode) {
   if (keycode == KC_NO)
     return;
 

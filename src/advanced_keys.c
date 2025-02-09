@@ -44,7 +44,7 @@ static void advanced_key_null_bind(const advanced_key_event_t *event) {
   case AK_EVENT_TYPE_RELEASE:
     if (state->is_pressed[index]) {
       // Also release the key if it is registered
-      layout_ll_release(keys[index], state->keycodes[index]);
+      layout_unregister(keys[index], state->keycodes[index]);
       state->is_pressed[index] = false;
     }
     state->keycodes[index] = KC_NO;
@@ -95,10 +95,10 @@ static void advanced_key_null_bind(const advanced_key_event_t *event) {
   // Bind resolution.
   for (uint32_t i = 0; i < 2; i++) {
     if (is_pressed[i] & !state->is_pressed[i]) {
-      layout_ll_press(keys[i], state->keycodes[i]);
+      layout_register(keys[i], state->keycodes[i]);
       state->is_pressed[i] = true;
     } else if (!is_pressed[i] & state->is_pressed[i]) {
-      layout_ll_release(keys[i], state->keycodes[i]);
+      layout_unregister(keys[i], state->keycodes[i]);
       state->is_pressed[i] = false;
     }
   }
@@ -143,7 +143,7 @@ static void advanced_key_dynamic_keystroke(const advanced_key_event_t *event) {
     if (state->is_pressed[i]) {
       // All actions except for `DKS_ACTION_HOLD` require the key to be
       // unregistered first if it was registered.
-      layout_ll_release(event->key, keycode);
+      layout_unregister(event->key, keycode);
       state->is_pressed[i] = false;
     }
 
@@ -185,9 +185,9 @@ static void advanced_key_tap_hold(const advanced_key_event_t *event) {
       if (deferred_action_push(&deferred_action))
         // We only perform the tap action if the release action was
         // successfully.
-        layout_ll_press(event->key, tap_hold->tap_keycode);
+        layout_register(event->key, tap_hold->tap_keycode);
     } else if (state->stage == TAP_HOLD_STAGE_HOLD)
-      layout_ll_release(event->key, tap_hold->hold_keycode);
+      layout_unregister(event->key, tap_hold->hold_keycode);
     state->stage = TAP_HOLD_STAGE_NONE;
     break;
 
@@ -203,7 +203,7 @@ static void advanced_key_toggle(const advanced_key_event_t *event) {
 
   switch (event->type) {
   case AK_EVENT_TYPE_PRESS:
-    layout_ll_press(event->key, toggle->keycode);
+    layout_register(event->key, toggle->keycode);
     state->is_toggled = !state->is_toggled;
     if (state->is_toggled) {
       state->since = timer_read();
@@ -215,7 +215,7 @@ static void advanced_key_toggle(const advanced_key_event_t *event) {
 
   case AK_EVENT_TYPE_RELEASE:
     if (!state->is_toggled)
-      layout_ll_release(event->key, toggle->keycode);
+      layout_unregister(event->key, toggle->keycode);
     state->stage = TOGGLE_STAGE_NONE;
     break;
 
@@ -235,12 +235,12 @@ void advanced_key_clear(void) {
     switch (ak->type) {
     case AK_TYPE_TAP_HOLD:
       if (state->tap_hold.stage == TAP_HOLD_STAGE_HOLD)
-        layout_ll_release(ak->key, ak->tap_hold.hold_keycode);
+        layout_unregister(ak->key, ak->tap_hold.hold_keycode);
       break;
 
     case AK_TYPE_TOGGLE:
       if (state->toggle.stage != TOGGLE_STAGE_NONE || state->toggle.is_toggled)
-        layout_ll_release(ak->key, ak->toggle.keycode);
+        layout_unregister(ak->key, ak->toggle.keycode);
       break;
 
     default:
@@ -291,7 +291,7 @@ void advanced_key_tick(bool has_non_tap_hold_press) {
             IS_MODIFIER_KEYCODE(ak->tap_hold.hold_keycode)) ||
            // Otherwise, the key must be held for the tapping term.
            timer_elapsed(state->tap_hold.since) >= ak->tap_hold.tapping_term)) {
-        layout_ll_press(ak->key, ak->tap_hold.hold_keycode);
+        layout_register(ak->key, ak->tap_hold.hold_keycode);
         state->tap_hold.stage = TAP_HOLD_STAGE_HOLD;
       }
       break;
