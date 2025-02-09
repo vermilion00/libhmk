@@ -29,6 +29,16 @@
 void layout_init(void);
 
 /**
+ * @brief Load advanced keys
+ *
+ * This function loads the advanced keys from the current profile. It should be
+ * called whenever the profile changes or the advanced keys are updated.
+ *
+ * @return None
+ */
+void layout_load_advanced_keys(void);
+
+/**
  * @brief Layout task
  *
  * @return None

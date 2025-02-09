@@ -13,6 +13,7 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "advanced_keys.h"
 #include "crc32.h"
 #include "deferred_actions.h"
 #include "eeconfig.h"
@@ -39,6 +40,7 @@ int main(void) {
   matrix_init();
   hid_init();
   deferred_action_init();
+  advanced_key_init();
   layout_init();
 
   tud_init(BOARD_TUD_RHPORT);

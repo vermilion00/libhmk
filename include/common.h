@@ -69,8 +69,8 @@ _Static_assert(1 <= NUM_KEYS && NUM_KEYS <= 256,
 #define NUM_ADVANCED_KEYS 32
 #endif
 
-_Static_assert(1 <= NUM_ADVANCED_KEYS && NUM_ADVANCED_KEYS <= 256,
-               "NUM_ADVANCED_KEYS must be between 1 and 256");
+_Static_assert(1 <= NUM_ADVANCED_KEYS && NUM_ADVANCED_KEYS <= 64,
+               "NUM_ADVANCED_KEYS must be between 1 and 64");
 
 //--------------------------------------------------------------------+
 // Keyboard Types
@@ -152,9 +152,6 @@ typedef struct __attribute__((packed)) {
   uint8_t hold_keycode;
   // Tapping term in milliseconds
   uint16_t tapping_term;
-  // Whether we should register the hold key when another non-Tap-Hold key is
-  // pressed, regardless of the tapping term
-  bool hold_on_other_key_press;
 } tap_hold_t;
 
 // Toggle configuration

@@ -15,9 +15,11 @@
 
 #include "layout.h"
 
+#include "advanced_keys.h"
 #include "bitmap.h"
 #include "deferred_actions.h"
 #include "eeconfig.h"
+#include "hardware/hardware.h"
 #include "hid.h"
 #include "keycodes.h"
 #include "matrix.h"
@@ -101,10 +103,36 @@ static bitmap_t key_press_states[] = MAKE_BITMAP(NUM_KEYS);
 // we need to remember the keycodes we pressed to release them correctly.
 static uint8_t active_keycodes[NUM_KEYS];
 
-void layout_init(void) {}
+// Store the indices of the advanced keys bind to each key. If no advanced key
+// is bind to a key, the index is 0. Otherwise, the index is added by 1.
+static uint8_t advanced_key_indices[NUM_LAYERS][NUM_KEYS];
+// Same as `active_keycodes` but for advanced keys
+static uint8_t active_advanced_keys[NUM_ADVANCED_KEYS];
+
+void layout_init(void) { layout_load_advanced_keys(); }
+
+void layout_load_advanced_keys(void) {
+  memset(advanced_key_indices, 0, sizeof(advanced_key_indices));
+  for (uint32_t i = 0; i < NUM_ADVANCED_KEYS; i++) {
+    const advanced_key_t *ak = &CURRENT_PROFILE.advanced_keys[i];
+
+    if (ak->type == AK_TYPE_NONE || ak->layer >= NUM_LAYERS ||
+        ak->key >= NUM_KEYS)
+      continue;
+
+    advanced_key_indices[ak->layer][ak->key] = i + 1;
+    if (ak->type == AK_TYPE_NULL_BIND && ak->null_bind.secondary_key < NUM_KEYS)
+      // Null Bind advanced keys also have a secondary key
+      advanced_key_indices[ak->layer][ak->null_bind.secondary_key] = i + 1;
+  }
+}
 
 void layout_task(void) {
+  static advanced_key_event_t ak_event = {0};
+  static uint32_t last_ak_tick = 0;
+
   const uint8_t current_layer = layout_get_current_layer();
+  bool has_non_tap_hold_press = false;
 
   for (uint32_t i = 0; i < NUM_KEYS; i++) {
     const key_state_t *k = &key_matrix[i];
@@ -117,21 +145,69 @@ void layout_task(void) {
     if (k->is_pressed & !last_key_press) {
       // Key press event
       const uint8_t keycode = layout_get_keycode(current_layer, i);
-      active_keycodes[i] = keycode;
+      const uint8_t ak_index = advanced_key_indices[current_layer][i];
 
-      layout_ll_press(i, keycode);
+      if (ak_index) {
+        active_advanced_keys[i] = ak_index;
+        ak_event = (advanced_key_event_t){
+            .type = AK_EVENT_TYPE_PRESS,
+            .key = i,
+            .keycode = keycode,
+            .ak_index = ak_index - 1,
+        };
+        advanced_key_process(&ak_event);
+        has_non_tap_hold_press |=
+            (CURRENT_PROFILE.advanced_keys[ak_index - 1].type !=
+             AK_TYPE_TAP_HOLD);
+      } else {
+        active_keycodes[i] = keycode;
+        layout_ll_press(i, keycode);
+        has_non_tap_hold_press |= (keycode != KC_NO);
+      }
     } else if (!k->is_pressed & last_key_press) {
       // Key release event
       const uint8_t keycode = active_keycodes[i];
-      active_keycodes[i] = KC_NO;
+      const uint8_t ak_index = active_advanced_keys[i];
 
-      layout_ll_release(i, keycode);
+      if (ak_index) {
+        active_advanced_keys[i] = 0;
+        ak_event = (advanced_key_event_t){
+            .type = AK_EVENT_TYPE_RELEASE,
+            .key = i,
+            .keycode = keycode,
+            .ak_index = ak_index - 1,
+        };
+        advanced_key_process(&ak_event);
+      } else {
+        active_keycodes[i] = KC_NO;
+        layout_ll_release(i, keycode);
+      }
     } else if (k->is_pressed) {
       // Key hold event
+      const uint8_t keycode = active_keycodes[i];
+      const uint8_t ak_index = active_advanced_keys[i];
+
+      if (ak_index) {
+        ak_event = (advanced_key_event_t){
+            .type = AK_EVENT_TYPE_HOLD,
+            .key = i,
+            .keycode = keycode,
+            .ak_index = ak_index - 1,
+        };
+        advanced_key_process(&ak_event);
+      }
     }
 
     // Finally, update the key state
     bitmap_set(key_press_states, i, k->is_pressed);
+  }
+
+  if (has_non_tap_hold_press || timer_elapsed(last_ak_tick) > 0) {
+    // We only need to tick the advanced keys every 1ms, or when there is a
+    // non-Tap-Hold key press event since these are the only cases that
+    // the advanced keys might perform an action.
+    advanced_key_tick(has_non_tap_hold_press);
+    last_ak_tick = timer_read();
   }
 
   if (should_send_reports) {

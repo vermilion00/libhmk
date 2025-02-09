@@ -22,9 +22,11 @@ static bool stack_lock;
 
 // Deferred action stack
 static uint32_t stack_size;
-static layout_deferred_action_t stack[LAYOUT_MAX_DEFERRED_ACTIONS];
+static deferred_action_t stack[MAX_DEFERRED_ACTIONS];
 
-static void deferred_action_execute(const layout_deferred_action_t *action) {
+static void deferred_action_execute(const deferred_action_t *action) {
+  static deferred_action_t tap_release = {0};
+
   switch (action->type) {
   case DEFERRED_ACTION_TYPE_PRESS:
     layout_ll_press(action->key, action->keycode);
@@ -35,8 +37,12 @@ static void deferred_action_execute(const layout_deferred_action_t *action) {
     break;
 
   case DEFERRED_ACTION_TYPE_TAP:
-    if (deferred_action_push(DEFERRED_ACTION_TYPE_RELEASE, action->key,
-                             action->keycode))
+    tap_release = (deferred_action_t){
+        .type = DEFERRED_ACTION_TYPE_RELEASE,
+        .key = action->key,
+        .keycode = action->keycode,
+    };
+    if (deferred_action_push(&tap_release))
       // We only perform the tap action if the release action was successfully
       // enqueued. Otherwise, the key will be stuck in the pressed state.
       layout_ll_press(action->key, action->keycode);
@@ -49,24 +55,19 @@ static void deferred_action_execute(const layout_deferred_action_t *action) {
 
 void deferred_action_init(void) {}
 
-bool deferred_action_push(layout_deferred_action_type_t type, uint8_t key,
-                          uint8_t keycode) {
-  if (stack_lock || stack_size == LAYOUT_MAX_DEFERRED_ACTIONS)
+bool deferred_action_push(const deferred_action_t *action) {
+  if (stack_lock || stack_size == MAX_DEFERRED_ACTIONS)
     return false;
 
   stack_lock = true;
-  stack[stack_size++] = (layout_deferred_action_t){
-      .type = type,
-      .key = key,
-      .keycode = keycode,
-  };
+  stack[stack_size++] = *action;
   stack_lock = false;
 
   return true;
 }
 
 void deferred_action_process(void) {
-  static layout_deferred_action_t buffer[LAYOUT_MAX_DEFERRED_ACTIONS];
+  static deferred_action_t buffer[MAX_DEFERRED_ACTIONS];
 
   if (stack_lock || stack_size == 0)
     return;

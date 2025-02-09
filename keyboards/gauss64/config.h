@@ -77,9 +77,9 @@
           KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,          \
           KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS,       \
           KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,          \
-          KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT, KC_ENT,  KC_VOLU,       \
+          KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT, KC_ENT,  KC_APP,        \
           KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,          \
-          KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   KC_VOLD,       \
+          KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,   MO(1),         \
           KC_LCTL, KC_LGUI, KC_LALT, KC_SPC,  KC_RALT, KC_LEFT, KC_DOWN,       \
           KC_RGHT,                                                             \
       },                                                                       \
@@ -91,7 +91,7 @@
           _______, KC_HOME, KC_PGDN, KC_END,  _______, _______, _______,       \
           KC_MPRV, KC_MPLY, KC_MNXT, _______, _______, PF_SWAP, _______,       \
           _______, _______, _______, _______, _______, _______, _______,       \
-          _______, _______, _______, _______, _______, _______, _______,       \
+          _______, KC_MUTE, KC_VOLD, KC_VOLU, _______, _______, _______,       \
           _______, KY_LOCK, _______, _______, _______, _______, _______,       \
           _______,                                                             \
       },                                                                       \
@@ -134,19 +134,6 @@
 
 #define DEFAULT_ADVANCED_KEYS                                                  \
   {                                                                            \
-      [0] =                                                                    \
-          {                                                                    \
-              .layer = 0,                                                      \
-              .key = 55,                                                       \
-              .type = AK_TYPE_TAP_HOLD,                                        \
-              .tap_hold =                                                      \
-                  {                                                            \
-                      .tap_keycode = KC_VOLD,                                  \
-                      .hold_keycode = MO(1),                                   \
-                      .tapping_term = 200,                                     \
-                      .hold_on_other_key_press = true,                         \
-                  },                                                           \
-          },                                                                   \
   }
 
 #define DEFAULT_PROFILE                                                        \

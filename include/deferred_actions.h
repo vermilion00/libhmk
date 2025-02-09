@@ -21,9 +21,9 @@
 // Deferred Actions
 //--------------------------------------------------------------------+
 
-#if !defined(LAYOUT_MAX_DEFERRED_ACTIONS)
+#if !defined(MAX_DEFERRED_ACTIONS)
 // Maximum number of deferred actions for each matrix scan
-#define LAYOUT_MAX_DEFERRED_ACTIONS 16
+#define MAX_DEFERRED_ACTIONS 16
 #endif
 
 // Deferred action type
@@ -33,7 +33,7 @@ typedef enum {
   DEFERRED_ACTION_TYPE_RELEASE,
   DEFERRED_ACTION_TYPE_TAP,
   DEFERRED_ACTION_TYPE_COUNT,
-} layout_deferred_action_type_t;
+} deferred_action_type_t;
 
 // Deferred action. The action will be deferred to the next matrix scan. This is
 // necessary to implement features like tapping keys and DKS.
@@ -44,7 +44,7 @@ typedef struct {
   uint8_t key;
   // Keycode associated with the action
   uint8_t keycode;
-} layout_deferred_action_t;
+} deferred_action_t;
 
 //--------------------------------------------------------------------+
 // Deferred Action API
@@ -63,14 +63,11 @@ void deferred_action_init(void);
  * The action may not be pushed if the stack is locked or full. The stack is
  * locked if it is being processed.
  *
- * @param type Action type
- * @param key Key index
- * @param keycode Keycode
+ * @param action Deferred action
  *
  * @return true if the action was pushed, false otherwise
  */
-bool deferred_action_push(layout_deferred_action_type_t type, uint8_t key,
-                          uint8_t keycode);
+bool deferred_action_push(const deferred_action_t *action);
 
 /**
  * @brief Process all deferred actions and clear the stack
