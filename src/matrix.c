@@ -59,6 +59,9 @@ void matrix_recalibrate(void) {
   // during the scan process.
   const uint32_t calibration_start = timer_read();
   while (timer_elapsed(calibration_start) < MATRIX_CALIBRATION_DURATION) {
+    // Run the analog task to possibly update the ADC values
+    analog_task();
+
     for (uint32_t i = 0; i < NUM_KEYS; i++) {
       const uint16_t new_adc_filtered =
           EMA(matrix_analog_read(i), key_matrix[i].adc_filtered);
