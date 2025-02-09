@@ -30,6 +30,17 @@ typedef struct {
 } ak_state_null_bind_t;
 
 //--------------------------------------------------------------------+
+// Dynamic Keystroke State
+//--------------------------------------------------------------------+
+
+typedef struct {
+  // Whether each key binding is registered
+  bool is_pressed[4];
+  // Whether the key is bottomed out
+  bool is_bottomed_out;
+} ak_state_dynamic_keystroke_t;
+
+//--------------------------------------------------------------------+
 // Tap-Hold State
 //--------------------------------------------------------------------+
 
@@ -76,6 +87,7 @@ typedef struct {
 // Advanced key state
 typedef union {
   ak_state_null_bind_t null_bind;
+  ak_state_dynamic_keystroke_t dynamic_keystroke;
   ak_state_tap_hold_t tap_hold;
   ak_state_toggle_t toggle;
 } advanced_key_state_t;
@@ -87,8 +99,7 @@ typedef union {
 // Key event type. The events are arranged in this order to allow for easy
 // access to the DKS action bitmaps.
 typedef enum {
-  AK_EVENT_TYPE_NONE = 0,
-  AK_EVENT_TYPE_HOLD,
+  AK_EVENT_TYPE_HOLD = 0,
   AK_EVENT_TYPE_PRESS,
   AK_EVENT_TYPE_BOTTOM_OUT,
   AK_EVENT_TYPE_RELEASE_FROM_BOTTOM_OUT,

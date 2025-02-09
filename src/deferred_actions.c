@@ -25,7 +25,7 @@ static uint32_t stack_size;
 static deferred_action_t stack[MAX_DEFERRED_ACTIONS];
 
 static void deferred_action_execute(const deferred_action_t *action) {
-  static deferred_action_t tap_release = {0};
+  static deferred_action_t deferred_action = {0};
 
   switch (action->type) {
   case DEFERRED_ACTION_TYPE_PRESS:
@@ -37,12 +37,12 @@ static void deferred_action_execute(const deferred_action_t *action) {
     break;
 
   case DEFERRED_ACTION_TYPE_TAP:
-    tap_release = (deferred_action_t){
+    deferred_action = (deferred_action_t){
         .type = DEFERRED_ACTION_TYPE_RELEASE,
         .key = action->key,
         .keycode = action->keycode,
     };
-    if (deferred_action_push(&tap_release))
+    if (deferred_action_push(&deferred_action))
       // We only perform the tap action if the release action was successfully
       // enqueued. Otherwise, the key will be stuck in the pressed state.
       layout_ll_press(action->key, action->keycode);

@@ -104,8 +104,66 @@ static void advanced_key_null_bind(const advanced_key_event_t *event) {
   }
 }
 
+static void advanced_key_dynamic_keystroke(const advanced_key_event_t *event) {
+  static deferred_action_t deferred_action = {0};
+
+  const dynamic_keystroke_t *dks =
+      &CURRENT_PROFILE.advanced_keys[event->ak_index].dynamic_keystroke;
+  ak_state_dynamic_keystroke_t *state =
+      &ak_states[event->ak_index].dynamic_keystroke;
+
+  const bool is_bottomed_out =
+      (key_matrix[event->key].distance >= dks->bottom_out_point);
+  uint8_t event_type = event->type;
+
+  if (is_bottomed_out & !state->is_bottomed_out)
+    event_type = AK_EVENT_TYPE_BOTTOM_OUT;
+  else if ((event_type != AK_EVENT_TYPE_RELEASE) & !is_bottomed_out &
+           state->is_bottomed_out)
+    // Key release is prioritized over release from bottom out.
+    event_type = AK_EVENT_TYPE_RELEASE_FROM_BOTTOM_OUT;
+  state->is_bottomed_out = is_bottomed_out;
+
+  if (event_type == AK_EVENT_TYPE_HOLD)
+    // Nothing to do for hold events
+    return;
+
+  // Disable Rapid Trigger when the key is bound with Dynamic Keystroke
+  matrix_disable_rapid_trigger(event->key, event_type != AK_EVENT_TYPE_RELEASE);
+  for (uint32_t i = 0; i < 4; i++) {
+    const uint8_t keycode = dks->keycodes[i];
+    // We arrange the event types so that we can use the event type as an index
+    // to the bitmap.
+    const uint8_t action =
+        (dks->bitmap[i] >> ((event_type - AK_EVENT_TYPE_PRESS) * 2)) & 3;
+
+    if (keycode == KC_NO || action == DKS_ACTION_HOLD)
+      continue;
+
+    if (state->is_pressed[i]) {
+      // All actions except for `DKS_ACTION_HOLD` require the key to be
+      // unregistered first if it was registered.
+      layout_ll_release(event->key, keycode);
+      state->is_pressed[i] = false;
+    }
+
+    if ((action == DKS_ACTION_PRESS) | (action == DKS_ACTION_TAP)) {
+      // The report may have been modified in the previous step so we defer
+      // the actual DKS action to the next matrix scan.
+      deferred_action = (deferred_action_t){
+          .type = action == DKS_ACTION_PRESS ? DEFERRED_ACTION_TYPE_PRESS
+                                             : DEFERRED_ACTION_TYPE_TAP,
+          .key = event->key,
+          .keycode = keycode,
+      };
+      state->is_pressed[i] = (deferred_action_push(&deferred_action) &
+                              (action == DKS_ACTION_PRESS));
+    }
+  }
+}
+
 static void advanced_key_tap_hold(const advanced_key_event_t *event) {
-  static deferred_action_t tap_release = {0};
+  static deferred_action_t deferred_action = {0};
 
   const tap_hold_t *tap_hold =
       &CURRENT_PROFILE.advanced_keys[event->ak_index].tap_hold;
@@ -119,12 +177,12 @@ static void advanced_key_tap_hold(const advanced_key_event_t *event) {
 
   case AK_EVENT_TYPE_RELEASE:
     if (state->stage == TAP_HOLD_STAGE_TAP) {
-      tap_release = (deferred_action_t){
+      deferred_action = (deferred_action_t){
           .type = DEFERRED_ACTION_TYPE_RELEASE,
           .key = event->key,
           .keycode = tap_hold->tap_keycode,
       };
-      if (deferred_action_push(&tap_release))
+      if (deferred_action_push(&deferred_action))
         // We only perform the tap action if the release action was
         // successfully.
         layout_ll_press(event->key, tap_hold->tap_keycode);
@@ -194,12 +252,16 @@ void advanced_key_clear(void) {
 }
 
 void advanced_key_process(const advanced_key_event_t *event) {
-  if (event->type == AK_EVENT_TYPE_NONE || event->ak_index >= NUM_ADVANCED_KEYS)
+  if (event->ak_index >= NUM_ADVANCED_KEYS)
     return;
 
   switch (CURRENT_PROFILE.advanced_keys[event->ak_index].type) {
   case AK_TYPE_NULL_BIND:
     advanced_key_null_bind(event);
+    break;
+
+  case AK_TYPE_DYNAMIC_KEYSTROKE:
+    advanced_key_dynamic_keystroke(event);
     break;
 
   case AK_TYPE_TAP_HOLD:
