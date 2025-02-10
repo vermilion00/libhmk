@@ -1,4 +1,4 @@
-# https://www.desmos.com/calculator/bp1bt9d5ke
+# https://www.desmos.com/calculator/nzl6twp6ui
 
 from decimal import Decimal
 from math import log2

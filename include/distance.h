@@ -29,7 +29,7 @@
 // the ADC values normalized to the range [0, LUT_SIZE - 1] and a is a constant
 // obtained through fitting the curve to the samples from GEON Raw HE switches
 // and OH49E-S Hall sensors. The table values are board-specific and should be
-// recalculated for each board. See https://www.desmos.com/calculator/bp1bt9d5ke
+// recalculated for each board. See https://www.desmos.com/calculator/nzl6twp6ui
 static const uint8_t distance_lut[] = {
     0,   1,   2,   3,   4,   5,   6,   6,   7,   8,   9,   10,  11,  12,  12,
     13,  14,  15,  16,  17,  17,  18,  19,  20,  21,  21,  22,  23,  24,  24,
