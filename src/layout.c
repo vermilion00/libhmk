@@ -107,7 +107,7 @@ static uint8_t active_keycodes[NUM_KEYS];
 // is bind to a key, the index is 0. Otherwise, the index is added by 1.
 static uint8_t advanced_key_indices[NUM_LAYERS][NUM_KEYS];
 // Same as `active_keycodes` but for advanced keys
-static uint8_t active_advanced_keys[NUM_ADVANCED_KEYS];
+static uint8_t active_advanced_keys[NUM_KEYS];
 
 void layout_init(void) { layout_load_advanced_keys(); }
 
