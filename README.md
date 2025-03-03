@@ -51,7 +51,7 @@ git clone https://github.com/peppapighs/libhmk.git
 
 3. Create a directory for your keyboard under `src/keyboards/` and create a `config.h` file with the required configurations. An example [`keyboards/gauss64/config.h`](keyboards/gauss64/config.h) is provided. See the header files in [`include/`](include/) and [`hardware/`](hardware/) for the available options.
 
-4. Configure the [`platformio.ini`](platformio.ini) file for your keyboard. The configuration file includes the following sections:
+4. Configure the `platformio.ini` file for your keyboard. An example configuration is available at `keyboards/<KEYBOAD_NAME>/pio.ini`. The configuration file includes the following sections:
 
    - `env`: Shared configuration for all environments. The following options are configurable:
      - `debug_tool` (Optional): See [Debugging](https://docs.platformio.org/en/latest/projectconf/sections/env/options/debug/index.html).
