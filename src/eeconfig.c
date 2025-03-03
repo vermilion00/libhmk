@@ -44,7 +44,6 @@ void eeconfig_init(void) {
 }
 
 bool eeconfig_reset(void) {
-  advanced_key_clear();
   const bool status =
       wear_leveling_write(0, &default_eeconfig, sizeof(default_eeconfig));
   layout_load_advanced_keys();
