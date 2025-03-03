@@ -31,8 +31,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "board_def.h"
+// Load the configuration file before the rest of the headers
 #include "config.h"
+
+#include "board_def.h"
 
 //--------------------------------------------------------------------+
 // Common Macros

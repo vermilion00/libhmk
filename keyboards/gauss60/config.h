@@ -36,6 +36,9 @@
 // Analog Configuration
 //--------------------------------------------------------------------+
 
+// Need more sample cycles since we don't use voltage followers
+#define ADC_NUM_SAMPLE_CYCLES 15
+
 #define ADC_NUM_MUX_INPUTS 5
 #define ADC_MUX_INPUT_CHANNELS {0, 1, 2, 3, 4}
 
@@ -72,8 +75,8 @@
 #define MATRIX_INVERT_ADC_VALUES
 
 // Approximated by measuring the actual values of GEON Raw HE switches
-#define MATRIX_INITIAL_REST_VALUE 2300
-#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 650
+#define MATRIX_INITIAL_REST_VALUE 2400
+#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 550
 
 //--------------------------------------------------------------------+
 // Keyboard Configuration
