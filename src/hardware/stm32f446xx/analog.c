@@ -243,16 +243,16 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 #if ADC_NUM_MUX_INPUTS > 0
     for (uint32_t i = 0; i < ADC_NUM_MUX_INPUTS; i++) {
       const uint16_t key = mux_input_matrix[current_mux_channel][i];
-      if (key < NUM_KEYS)
-        adc_values[key] = adc_buffer[i];
+      if (key)
+        adc_values[key - 1] = adc_buffer[i];
     }
 #endif
 
 #if ADC_NUM_RAW_INPUTS > 0
     for (uint32_t i = 0; i < ADC_NUM_RAW_INPUTS; i++) {
       const uint16_t key = raw_input_vector[i];
-      if (key < NUM_KEYS)
-        adc_values[key] = adc_buffer[ADC_NUM_MUX_INPUTS + i];
+      if (key)
+        adc_values[key - 1] = adc_buffer[ADC_NUM_MUX_INPUTS + i];
     }
 #endif
 
