@@ -37,18 +37,18 @@
 //--------------------------------------------------------------------+
 
 #define ADC_NUM_MUX_INPUTS 9
-#define ADC_MUX_INPUT_CHANNELS {3, 4, 5, 6, 7, 14, 15, 8, 9}
+#define ADC_MUX_INPUT_CHANNELS {0, 1, 2, 3, 4, 5, 6, 7, 8}
 
-// TMUX1308 8-Channel Analog Multiplexer
+// SN74LV4051A 8-Channel Analog Multiplexer
 #define ADC_NUM_MUX_SELECT_PINS 3
 #define ADC_MUX_SELECT_PORTS {GPIOC, GPIOC, GPIOC}
 #define ADC_MUX_SELECT_PINS {GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15}
 #define ADC_MUX_INPUT_MATRIX                                                    \
   {                                                                             \
-      {3, 15, 21, 29, 36, 56, 59, 62, 66}, {2, 14, 0, 28, 35, 43, 58, 63, 67},  \
-      {1, 13, 0, 27, 0, 42, 57, 64, 54},   {4, 16, 22, 30, 37, 55, 60, 61, 65}, \
-      {5, 9, 17, 23, 32, 38, 31, 47, 50},  {8, 12, 20, 26, 0, 41, 46, 49, 53},  \
-      {6, 10, 18, 24, 33, 39, 44, 0, 51},  {7, 11, 19, 25, 34, 40, 45, 48, 52}, \
+      {4, 15, 18, 29, 36, 56, 59, 62, 66}, {3, 14, 17, 28, 35, 43, 58, 63, 67}, \
+      {2, 13, 1, 27, 0, 42, 57, 64, 54},   {0, 16, 19, 30, 37, 55, 60, 61, 65}, \
+      {5, 9, 20, 23, 32, 38, 31, 47, 50},  {8, 12, 22, 26, 0, 41, 46, 49, 53},  \
+      {6, 10, 0, 24, 33, 39, 44, 0, 51},   {7, 11, 21, 25, 34, 40, 45, 48, 52}, \
   }
 
 //--------------------------------------------------------------------+
@@ -61,7 +61,7 @@
 
 // Approximated by measuring the actual values of GEON Raw HE switches
 #define MATRIX_INITIAL_REST_VALUE 2400
-#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 550
+#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 650
 
 //--------------------------------------------------------------------+
 // Keyboard Configuration
@@ -73,10 +73,10 @@
   {                                                                            \
       {                                                                        \
           KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,          \
-          KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,  KC_MINS, KC_BSLS,       \
-          _______, KC_DEL,  KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,          \
+          KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,  KC_MINS, _______,       \
+          KC_BSPC, _______, KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,          \
           KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC,       \
-          KC_RBRC, KC_BSPC, KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,          \
+          KC_RBRC, KC_BSLS, KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,          \
           KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,       \
           KC_ENT,  KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,          \
           KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, MO(1),         \
@@ -86,7 +86,7 @@
       {                                                                        \
           KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,         \
           KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______,       \
-          _______, KC_INS,  KC_PSCR, _______, KC_PGUP, _______, _______,       \
+          KC_DEL,  _______, KC_PSCR, _______, KC_PGUP, _______, _______,       \
           _______, _______, _______, _______, PF(0),   PF(1),   PF(2),         \
           PF(3),   _______, _______, KC_HOME, KC_PGDN, KC_END,  _______,       \
           _______, _______, KC_MPRV, KC_MPLY, KC_MNXT, _______, _______,       \
