@@ -29,20 +29,38 @@
 // Magic number to identify the end of the configuration
 #define EECONFIG_MAGIC_END 0x0A4B4D48
 
+// Keyboard calibration configuration
+typedef struct __attribute__((packed)) {
+  // Initial rest value of the key matrix. If the value is smaller than the
+  // actual rest value, the key will have a dead zone at the beginning of the
+  // keystroke. If the value is larger than the actual rest value, a longer
+  // calibration process may be required.
+  uint16_t initial_rest_value;
+  // Minimum change in ADC values for the key to be considered bottom-out. If
+  // the value is larger than the actual bottom-out threshold, the key will have
+  // a dead zone at the end of the keystroke. If the value is smaller than the
+  // actual bottom-out threshold, the distance calculation may be inaccurate
+  // until the first bottom-out event.
+  uint16_t initial_bottom_out_threshold;
+} eeconfig_calibration_t;
+
 // Keyboard profile configuration
 typedef struct __attribute__((packed)) {
   uint8_t keymap[NUM_LAYERS][NUM_KEYS];
   actuation_t actuation_map[NUM_KEYS];
   advanced_key_t advanced_keys[NUM_ADVANCED_KEYS];
 } eeconfig_profile_t;
-
 // Keyboard configuration
 typedef struct __attribute__((packed)) {
   uint32_t magic_start;
   uint16_t version;
+
+  eeconfig_calibration_t calibration;
+
   uint8_t current_profile;
   uint8_t last_non_default_profile;
   eeconfig_profile_t profiles[NUM_PROFILES];
+
   uint32_t magic_end;
 } eeconfig_t;
 
@@ -55,8 +73,12 @@ extern const eeconfig_t *eeconfig;
 #define CURRENT_PROFILE (eeconfig->profiles[eeconfig->current_profile])
 
 //--------------------------------------------------------------------+
-// Default Profile Configuration
+// Default Keyboard Configuration
 //--------------------------------------------------------------------+
+
+#if !defined(DEFAULT_CALIBRATION)
+#error "DEFAULT_CALIBRATION is not defined"
+#endif
 
 #if !defined(DEFAULT_PROFILE)
 #error "DEFAULT_PROFILE is not defined"
@@ -79,6 +101,15 @@ void eeconfig_init(void);
  * @return true if successful, false otherwise
  */
 bool eeconfig_reset(void);
+
+/**
+ * @brief Set the calibration configuration
+ *
+ * @param calibration New calibration configuration
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_calibration(const void *calibration);
 
 /**
  * @brief Set the current profile

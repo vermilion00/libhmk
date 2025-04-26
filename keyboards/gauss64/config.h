@@ -59,13 +59,16 @@
 // the keys so we must invert the values.
 #define MATRIX_INVERT_ADC_VALUES
 
-// Approximated by measuring the actual values of GEON Raw HE switches
-#define MATRIX_INITIAL_REST_VALUE 2300
-#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 650
-
 //--------------------------------------------------------------------+
 // Keyboard Configuration
 //--------------------------------------------------------------------+
+
+// Approximated by measuring the actual values of GEON Raw HE switches
+#define DEFAULT_CALIBRATION                                                    \
+  {                                                                            \
+      .initial_rest_value = 2300,                                              \
+      .initial_bottom_out_threshold = 650,                                     \
+  }
 
 #define NUM_KEYS 64
 

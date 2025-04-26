@@ -122,6 +122,34 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
       // Nothing to do for other stages
       return true;
 
+    case CLASS_REQUEST_GET_CALIBRATION:
+      if (stage == CONTROL_STAGE_SETUP) {
+        if (request->wLength < sizeof(eeconfig->calibration))
+          // Request length is smaller than the response
+          return false;
+        return tud_control_xfer(rhport, request, (void *)&eeconfig->calibration,
+                                sizeof(eeconfig->calibration));
+      }
+      // Nothing to do for other stages
+      return true;
+
+    case CLASS_REQUEST_SET_CALIBRATION:
+      if (stage == CONTROL_STAGE_SETUP) {
+        if (request->wLength != sizeof(eeconfig->calibration) ||
+            request->wLength > VENDOR_BUFFER_SIZE)
+          // Request length is smaller than the response
+          return false;
+        return tud_control_xfer(rhport, request, vendor_buffer,
+                                request->wLength);
+      } else if (stage == CONTROL_STAGE_DATA) {
+        if (!eeconfig_set_calibration(vendor_buffer))
+          // Failed to set the calibration configuration
+          return false;
+        return tud_control_status(rhport, request);
+      }
+      // Nothing to do for other stages
+      return true;
+
     case CLASS_REQUEST_GET_PROFILE:
       if (stage == CONTROL_STAGE_SETUP) {
         static uint8_t res;

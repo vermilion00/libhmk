@@ -44,10 +44,11 @@ void matrix_init(void) { matrix_recalibrate(); }
 
 void matrix_recalibrate(void) {
   for (uint32_t i = 0; i < NUM_KEYS; i++) {
-    key_matrix[i].adc_filtered = MATRIX_INITIAL_REST_VALUE;
-    key_matrix[i].adc_rest_value = MATRIX_INITIAL_REST_VALUE;
+    key_matrix[i].adc_filtered = eeconfig->calibration.initial_rest_value;
+    key_matrix[i].adc_rest_value = eeconfig->calibration.initial_rest_value;
     key_matrix[i].adc_bottom_out_value =
-        M_MIN(MATRIX_INITIAL_REST_VALUE + MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD,
+        M_MIN(eeconfig->calibration.initial_rest_value +
+                  eeconfig->calibration.initial_bottom_out_threshold,
               ADC_MAX_VALUE);
     key_matrix[i].distance = 0;
     key_matrix[i].extremum = 0;
@@ -76,9 +77,10 @@ void matrix_recalibrate(void) {
 
       // Update the bottom-out value to be the minimum bottom-out value based on
       // the updated rest value
-      key_matrix[i].adc_bottom_out_value = M_MIN(
-          key_matrix[i].adc_rest_value + MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD,
-          ADC_MAX_VALUE);
+      key_matrix[i].adc_bottom_out_value =
+          M_MIN(key_matrix[i].adc_rest_value +
+                    eeconfig->calibration.initial_bottom_out_threshold,
+                ADC_MAX_VALUE);
     }
   }
 }

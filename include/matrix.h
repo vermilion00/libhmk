@@ -26,30 +26,6 @@
 #define MATRIX_CALIBRATION_DURATION 500
 #endif
 
-#if !defined(MATRIX_INITIAL_REST_VALUE)
-// Initial rest value of the key matrix. If the value is smaller than the
-// actual rest value, the key will have a dead zone at the beginning of the
-// keystroke. If the value is larger than the actual rest value, a longer
-// calibration process may be required.
-#define MATRIX_INITIAL_REST_VALUE 0
-#endif
-
-_Static_assert(MATRIX_INITIAL_REST_VALUE <= ADC_MAX_VALUE,
-               "MATRIX_INITIAL_REST_VALUE must be at most ADC_MAX_VALUE");
-
-#if !defined(MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD)
-// Minimum change in ADC values for the key to be considered bottom-out. If the
-// value is larger than the actual bottom-out threshold, the key will have a
-// dead zone at the end of the keystroke. If the value is smaller than the
-// actual bottom-out threshold, the distance calculation may be inaccurate until
-// the first bottom-out event.
-#define MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD 0
-#endif
-
-_Static_assert(
-    MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD <= ADC_MAX_VALUE,
-    "MATRIX_INITIAL_BOTTOM_OUT_THRESHOLD must be at most ADC_MAX_VALUE");
-
 #if !defined(MATRIX_EMA_ALPHA_EXPONENT)
 // Exponent of the alpha parameter of the exponential moving average (EMA)
 // filter used to smooth the ADC values. Higher values will result in smoother

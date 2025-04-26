@@ -29,6 +29,7 @@ const eeconfig_t *eeconfig;
 static const eeconfig_t default_eeconfig = {
     .magic_start = EECONFIG_MAGIC_START,
     .version = EECONFIG_VERSION,
+    .calibration = DEFAULT_CALIBRATION,
     .current_profile = 0,
     .last_non_default_profile = 0,
     .profiles = {[0 ... NUM_PROFILES - 1] = DEFAULT_PROFILE},
@@ -49,6 +50,10 @@ bool eeconfig_reset(void) {
   layout_load_advanced_keys();
 
   return status;
+}
+
+bool eeconfig_set_calibration(const void *calibration) {
+  return EECONFIG_UPDATE(calibration, calibration);
 }
 
 bool eeconfig_set_current_profile(uint8_t profile) {
