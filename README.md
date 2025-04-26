@@ -49,14 +49,14 @@ git clone https://github.com/peppapighs/libhmk.git
 
 2. Open the project in PlatformIO, for example, through Visual Studio Code.
 
-3. Create a directory for your keyboard under `src/keyboards/` and create a `config.h` file with the required configurations. An example [`keyboards/gauss64/config.h`](keyboards/gauss64/config.h) is provided. See the header files in [`include/`](include/) and [`hardware/`](hardware/) for the available options.
+3. Create a directory for your keyboard under `src/keyboards/` and create a `config.h` file with the required configurations. An example [`keyboards/he60/config.h`](keyboards/he60/config.h) is provided. See the header files in [`include/`](include/) and [`hardware/`](hardware/) for the available options.
 
 4. Configure the `platformio.ini` file for your keyboard. An example configuration is available at `keyboards/<KEYBOAD_NAME>/pio.ini`. The configuration file includes the following sections:
 
    - `env`: Shared configuration for all environments. The following options are configurable:
      - `debug_tool` (Optional): See [Debugging](https://docs.platformio.org/en/latest/projectconf/sections/env/options/debug/index.html).
      - `upload_protocol` (Optional): See [Upload](https://docs.platformio.org/en/latest/projectconf/sections/env/options/upload/index.html).
-   - `env:<YOUR_ENVIRONMENT_NAME>`: Configuration specific to your keyboard. An example `env:gauss64` is provided. The following options are configurable:
+   - `env:<YOUR_ENVIRONMENT_NAME>`: Configuration specific to your keyboard. An example `env:he60` is provided. The following options are configurable:
      - `board`: The microcontroller used by your keyboard. See [Platform](https://docs.platformio.org/en/latest/projectconf/sections/env/options/platform/index.html).
      - `board_build.f_cpu` (Optional): The clock frequency of the microcontroller if it is not the default value. See [Platform](https://docs.platformio.org/en/latest/projectconf/sections/env/options/platform/index.html).
      - `build_flags`: Flags passed to the compiler. Include the path to the hardware-specific header files and the configuration file for your keyboard that you created in the previous step. See [Build](https://docs.platformio.org/en/latest/projectconf/sections/env/options/build/index.html).
