@@ -112,7 +112,45 @@ static void board_usb_init(void) {
 #endif
 }
 
+static void board_bootloader_jump(void) {
+  volatile const uint32_t *bootloader_vector =
+      (volatile const uint32_t *)BOOTLOADER_ADDR;
+  uint32_t sp = bootloader_vector[0];
+  uint32_t bootloader_entry = bootloader_vector[1];
+
+  SysTick->CTRL = 0;
+  SysTick->LOAD = 0;
+  SysTick->VAL = 0;
+
+  // Disable all interrupts
+  NVIC->ICER[0] = 0xFFFFFFFF;
+  NVIC->ICER[1] = 0xFFFFFFFF;
+  NVIC->ICER[2] = 0xFFFFFFFF;
+  NVIC->ICER[3] = 0xFFFFFFFF;
+
+  SCB->VTOR = (uint32_t)BOOTLOADER_ADDR;
+
+  // Set stack pointer
+  __set_MSP(sp);
+  __set_PSP(sp);
+
+  ((void (*)(void))bootloader_entry)();
+  while (1)
+    ;
+}
+
+extern uint32_t _board_bootloader_flag[];
+#define BOARD_BOOTLOADER_FLAG _board_bootloader_flag[0]
+
 void board_init(void) {
+  // We need to enter the bootloader before the clock peripheral is initialized
+  // since it is initialized differently in the bootloader.
+  if (BOARD_BOOTLOADER_FLAG == BOOTLOADER_MAGIC) {
+    // Clear the bootloader flag before jumping to the bootloader
+    BOARD_BOOTLOADER_FLAG = 0;
+    board_bootloader_jump();
+  }
+
   HAL_Init();
 
   board_clock_init();
@@ -139,6 +177,14 @@ uint32_t board_serial(uint16_t *buf) {
     buf[i] = serial_str[i];
 
   return 24;
+}
+
+void board_enter_bootloader(void) {
+  // Set the bootloader flag
+  BOARD_BOOTLOADER_FLAG = BOOTLOADER_MAGIC;
+
+  // Reset the board to enter the bootloader
+  NVIC_SystemReset();
 }
 
 //--------------------------------------------------------------------+

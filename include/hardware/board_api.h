@@ -51,6 +51,15 @@ void board_error_handler(void);
 void board_reset(void);
 
 /**
+ * @brief Enter the bootloader mode
+ *
+ * If bootloader mode is supported, this function should not return.
+ *
+ * @return None
+ */
+void board_enter_bootloader(void);
+
+/**
  * @brief Get the board serial number
  *
  * The serial number is a UTF-16-LE encoded string with a maximum length of 32

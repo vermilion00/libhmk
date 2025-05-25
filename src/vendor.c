@@ -86,7 +86,7 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
       return true;
 
     case CLASS_REQUEST_BOOTLOADER:
-      // TODO: Implement bootloader request
+      board_enter_bootloader();
       return true;
 
     case CLASS_REQUEST_FACTORY_RESET:
