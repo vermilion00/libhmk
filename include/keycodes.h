@@ -193,6 +193,7 @@ typedef enum {
   SP_LAYER_LOCK = 0xD1,
   SP_PROFILE_SWAP = 0xD2,
   SP_PROFILE_NEXT = 0xD3,
+  SP_BOOT = 0xD4,
 
   XXXXXXX = KC_NO,
   _______ = KC_TRANSPARENT,

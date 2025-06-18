@@ -255,6 +255,10 @@ void layout_register(uint8_t key, uint8_t keycode) {
                                  NUM_PROFILES);
     break;
 
+  case SP_BOOT:
+    board_enter_bootloader();
+    break;
+
   default:
     break;
   }
