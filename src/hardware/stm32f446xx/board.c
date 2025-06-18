@@ -155,6 +155,11 @@ void board_init(void) {
 
   board_clock_init();
   board_usb_init();
+
+  // Enable cycle counter
+  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+  DWT->CYCCNT = 0;
 }
 
 void board_error_handler(void) {
@@ -164,6 +169,14 @@ void board_error_handler(void) {
 }
 
 void board_reset(void) { NVIC_SystemReset(); }
+
+void board_enter_bootloader(void) {
+  // Set the bootloader flag
+  BOARD_BOOTLOADER_FLAG = BOOTLOADER_MAGIC;
+
+  // Reset the board to enter the bootloader
+  NVIC_SystemReset();
+}
 
 uint32_t board_serial(uint16_t *buf) {
   static char serial_str[24 + 1];
@@ -179,13 +192,7 @@ uint32_t board_serial(uint16_t *buf) {
   return 24;
 }
 
-void board_enter_bootloader(void) {
-  // Set the bootloader flag
-  BOARD_BOOTLOADER_FLAG = BOOTLOADER_MAGIC;
-
-  // Reset the board to enter the bootloader
-  NVIC_SystemReset();
-}
+uint32_t board_cycle_count(void) { return DWT->CYCCNT; }
 
 //--------------------------------------------------------------------+
 // HAL Callbacks

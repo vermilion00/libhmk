@@ -70,3 +70,13 @@ void board_enter_bootloader(void);
  * @return Length of the serial number in characters
  */
 uint32_t board_serial(uint16_t *buf);
+
+/**
+ * @brief Get the current cycle count
+ *
+ * This function returns the current cycle count of the board's CPU. It can be
+ * used for performance measurement or timing purposes.
+ *
+ * @return Current cycle count
+ */
+uint32_t board_cycle_count(void);
