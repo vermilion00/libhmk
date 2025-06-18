@@ -55,7 +55,7 @@ typedef enum {
   CLASS_REQUEST_BOOTLOADER,
   CLASS_REQUEST_FACTORY_RESET,
   CLASS_REQUEST_RECALIBRATE,
-  CLASS_REQUEST_DEBUG,
+  CLASS_REQUEST_KEY_INFO,
   CLASS_REQUEST_GET_CALIBRATION,
   CLASS_REQUEST_SET_CALIBRATION,
   CLASS_REQUEST_GET_PROFILE,
@@ -72,4 +72,4 @@ typedef enum {
 typedef struct __attribute__((packed)) {
   uint16_t adc_value;
   uint8_t distance;
-} class_res_debug_t;
+} class_res_key_info_t;

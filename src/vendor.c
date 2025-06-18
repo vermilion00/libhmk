@@ -107,9 +107,9 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
       // Nothing to do for other stages
       return true;
 
-    case CLASS_REQUEST_DEBUG:
+    case CLASS_REQUEST_KEY_INFO:
       if (stage == CONTROL_STAGE_SETUP) {
-        static class_res_debug_t res[NUM_KEYS];
+        static class_res_key_info_t res[NUM_KEYS];
         if (request->wLength < sizeof(res))
           // Request length is smaller than the response
           return false;
