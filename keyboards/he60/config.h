@@ -55,7 +55,7 @@
 // Key Matrix Configuration
 //--------------------------------------------------------------------+
 
-// The raw ADC values are not directly proportional to the travel distance of
+// OH49E-S output is not directly proportional to the travel distance of
 // the keys so we must invert the values.
 #define MATRIX_INVERT_ADC_VALUES
 
