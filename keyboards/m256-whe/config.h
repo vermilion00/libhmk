@@ -52,14 +52,6 @@
   }
 
 //--------------------------------------------------------------------+
-// Key Matrix Configuration
-//--------------------------------------------------------------------+
-
-// The raw ADC values are not directly proportional to the travel distance of
-// the keys so we must invert the values.
-#define MATRIX_INVERT_ADC_VALUES
-
-//--------------------------------------------------------------------+
 // Keyboard Configuration
 //--------------------------------------------------------------------+
 
@@ -67,7 +59,7 @@
 // a 1.6mm thick PCB
 #define DEFAULT_CALIBRATION                                                    \
   {                                                                            \
-      .initial_rest_value = 2000,                                              \
+      .initial_rest_value = 2300,                                              \
       .initial_bottom_out_threshold = 650,                                     \
   }
 
