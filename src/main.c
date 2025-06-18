@@ -20,11 +20,14 @@
 #include "hardware/hardware.h"
 #include "hid.h"
 #include "layout.h"
+#include "log.h"
 #include "matrix.h"
 #include "tusb.h"
 #include "wear_leveling.h"
 
 int main(void) {
+  log_init();
+
   // Initialize the hardware
   board_init();
   timer_init();

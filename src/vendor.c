@@ -17,6 +17,7 @@
 
 #include "eeconfig.h"
 #include "hardware/hardware.h"
+#include "log.h"
 #include "matrix.h"
 #include "tusb.h"
 #include "usb_descriptors.h"
@@ -159,6 +160,23 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
         res = eeconfig->current_profile;
         return tud_control_xfer(rhport, request, (void *)&res, sizeof(res));
       }
+      // Nothing to do for other stages
+      return true;
+
+    case CLASS_REQUEST_LOG:
+#if defined(LOG_ENABLED)
+      if (stage == CONTROL_STAGE_SETUP) {
+        if (request->wLength < log_buffer_size)
+          // Request length is smaller than the response
+          return false;
+        return tud_control_xfer(rhport, request, (void *)log_buffer,
+                                log_buffer_size);
+      } else if (stage == CONTROL_STAGE_DATA) {
+        // Clear the log buffer after sending
+        log_clear();
+        return tud_control_status(rhport, request);
+      }
+#endif
       // Nothing to do for other stages
       return true;
 
