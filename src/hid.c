@@ -193,6 +193,7 @@ void hid_keycode_remove(uint8_t keycode) {
 }
 
 void hid_send_reports(void) {
+#if !defined(HID_DISABLED)
   if (tud_suspended())
     // Wake up the host if it's suspended
     tud_remote_wakeup();
@@ -209,6 +210,7 @@ void hid_send_reports(void) {
 
   // Start from the first report ID
   hid_send_hid_report(REPORT_ID_SYSTEM_CONTROL);
+#endif
 }
 
 //--------------------------------------------------------------------+
