@@ -137,4 +137,5 @@
       .keymap = DEFAULT_KEYMAP,                                                \
       .actuation_map = DEFAULT_ACTUATION_MAP,                                  \
       .advanced_keys = DEFAULT_ADVANCED_KEYS,                                  \
+      .tick_rate = 30,                                                         \
   }

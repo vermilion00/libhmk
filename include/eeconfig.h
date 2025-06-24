@@ -49,6 +49,7 @@ typedef struct __attribute__((packed)) {
   uint8_t keymap[NUM_LAYERS][NUM_KEYS];
   actuation_t actuation_map[NUM_KEYS];
   advanced_key_t advanced_keys[NUM_ADVANCED_KEYS];
+  uint8_t tick_rate;
 } eeconfig_profile_t;
 // Keyboard configuration
 typedef struct __attribute__((packed)) {
@@ -101,6 +102,16 @@ void eeconfig_init(void);
  * @return true if successful, false otherwise
  */
 bool eeconfig_reset(void);
+
+/**
+ * @brief Set the tick rate
+ *
+ * @param profile Profile index
+ * @param tick_rate New tick rate value
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate);
 
 /**
  * @brief Set the calibration configuration

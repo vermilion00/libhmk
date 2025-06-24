@@ -31,7 +31,7 @@ static const eeconfig_t default_eeconfig = {
     .version = EECONFIG_VERSION,
     .calibration = DEFAULT_CALIBRATION,
     .current_profile = 0,
-    .last_non_default_profile = 0,
+    .last_non_default_profile = M_MIN(1, NUM_PROFILES - 1),
     .profiles = {[0 ... NUM_PROFILES - 1] = DEFAULT_PROFILE},
     .magic_end = EECONFIG_MAGIC_END,
 };
@@ -50,6 +50,13 @@ bool eeconfig_reset(void) {
   layout_load_advanced_keys();
 
   return status;
+}
+
+bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  return EECONFIG_UPDATE(profiles[profile].tick_rate, &tick_rate);
 }
 
 bool eeconfig_set_calibration(const void *calibration) {

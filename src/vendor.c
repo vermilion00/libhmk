@@ -281,6 +281,36 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
       // Nothing to do for other stages
       return true;
 
+    case CLASS_REQUEST_GET_TICK_RATE:
+      if (stage == CONTROL_STAGE_SETUP) {
+        static uint8_t res;
+        if (request->wValue >= NUM_PROFILES || request->wLength < sizeof(res))
+          // Invalid profile number or request length
+          return false;
+        res = eeconfig->profiles[request->wValue].tick_rate;
+        return tud_control_xfer(rhport, request, (void *)&res, sizeof(res));
+      }
+      // Nothing to do for other stages
+      return true;
+
+    case CLASS_REQUEST_SET_TICK_RATE:
+      if (stage == CONTROL_STAGE_SETUP) {
+        if (request->wValue >= NUM_PROFILES ||
+            request->wLength != sizeof(uint8_t) ||
+            request->wLength > VENDOR_BUFFER_SIZE)
+          // Invalid profile number or request length
+          return false;
+        return tud_control_xfer(rhport, request, vendor_buffer,
+                                request->wLength);
+      } else if (stage == CONTROL_STAGE_DATA) {
+        if (!eeconfig_set_tick_rate(request->wValue, vendor_buffer[0]))
+          // Failed to set the tick rate
+          return false;
+        return tud_control_status(rhport, request);
+      }
+      // Nothing to do for other stages
+      return true;
+
     default:
       break;
     }

@@ -15,14 +15,16 @@
 
 #include "deferred_actions.h"
 
+#include "eeconfig.h"
 #include "layout.h"
 
-// Lock for the deferred action stack
-static bool stack_lock;
+// Lock for the deferred action queue
+static bool queue_lock;
 
-// Deferred action stack
-static uint32_t stack_size;
-static deferred_action_t stack[MAX_DEFERRED_ACTIONS];
+// Deferred action queue
+static uint32_t queue_head;
+static uint32_t queue_size;
+static deferred_action_t queue[MAX_DEFERRED_ACTIONS];
 
 static void deferred_action_execute(const deferred_action_t *action) {
   static deferred_action_t deferred_action = {0};
@@ -56,12 +58,18 @@ static void deferred_action_execute(const deferred_action_t *action) {
 void deferred_action_init(void) {}
 
 bool deferred_action_push(const deferred_action_t *action) {
-  if (stack_lock || stack_size == MAX_DEFERRED_ACTIONS)
+  if (queue_lock || queue_size == MAX_DEFERRED_ACTIONS)
     return false;
 
-  stack_lock = true;
-  stack[stack_size++] = *action;
-  stack_lock = false;
+  queue_lock = true;
+
+  deferred_action_t *queue_tail =
+      &queue[(queue_head + queue_size) & (MAX_DEFERRED_ACTIONS - 1)];
+  queue_size++;
+  *queue_tail = *action;
+  queue_tail->ticks = CURRENT_PROFILE.tick_rate;
+
+  queue_lock = false;
 
   return true;
 }
@@ -69,20 +77,34 @@ bool deferred_action_push(const deferred_action_t *action) {
 void deferred_action_process(void) {
   static deferred_action_t buffer[MAX_DEFERRED_ACTIONS];
 
-  if (stack_lock || stack_size == 0)
+  if (queue_lock || queue_size == 0)
     return;
 
-  stack_lock = true;
-  // Copy all the actions in the stack to a buffer to avoid the stack being
-  // locked while executing those actions
-  const uint32_t prev_stack_size = stack_size;
-  for (uint32_t i = 0; i < stack_size; i++)
-    buffer[i] = stack[i];
-  // Clear the stack
-  stack_size = 0;
-  stack_lock = false;
+  queue_lock = true;
+
+  // Copy actions in the queue to a buffer to avoid the queue being locked while
+  // executing those actions
+  uint32_t action_count = 0;
+  for (uint32_t i = 0; i < queue_size; i++) {
+    deferred_action_t *action =
+        &queue[(queue_head + i) & (MAX_DEFERRED_ACTIONS - 1)];
+
+    // Make sure the ticks are not greater than the tick rate
+    action->ticks = M_MIN(action->ticks, CURRENT_PROFILE.tick_rate);
+    if (action->ticks > 0) {
+      // Decrement the ticks and skip the action if it is not ready yet
+      action->ticks--;
+      continue;
+    }
+    buffer[action_count++] = *action;
+  }
+  // Move the head of the queue forward by the number of actions processed
+  queue_head = (queue_head + action_count) & (MAX_DEFERRED_ACTIONS - 1);
+  queue_size -= action_count;
+
+  queue_lock = false;
 
   // Execute all the actions
-  for (uint32_t i = 0; i < prev_stack_size; i++)
+  for (uint32_t i = 0; i < action_count; i++)
     deferred_action_execute(&buffer[i]);
 }

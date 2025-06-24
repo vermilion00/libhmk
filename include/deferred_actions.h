@@ -26,6 +26,9 @@
 #define MAX_DEFERRED_ACTIONS 16
 #endif
 
+_Static_assert(M_IS_POWER_OF_TWO(MAX_DEFERRED_ACTIONS),
+               "MAX_DEFERRED_ACTIONS must be a power of two");
+
 // Deferred action type
 typedef enum {
   DEFERRED_ACTION_TYPE_NONE = 0,
@@ -44,6 +47,8 @@ typedef struct {
   uint8_t key;
   // Keycode associated with the action
   uint8_t keycode;
+  // Number of matrix scans to wait before executing the action
+  uint8_t ticks;
 } deferred_action_t;
 
 //--------------------------------------------------------------------+

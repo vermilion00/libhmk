@@ -23,9 +23,8 @@ This repository contains libraries for building a Hall-effect keyboard firmware.
 - [x] **Automatic Calibration**: Automatically calibrate the analog input without requiring user intervention.
 - [x] **EEPROM Emulation**: No external EEPROM required. Emulate EEPROM using the internal flash memory.
 - [x] **Web Configurator**: Configure the firmware using [hmkconf](https://github.com/peppapighs/hmkconf) without needing to recompile the firmware.
-- [ ] **Bootloader**: Optional UF2 bootloader for firmware updates over USB.
+- [x] **Tick Rate**: Customizable tick rate for Tap-Hold and Dynamic Keystroke.
 - [ ] **Gamepad**: Support for gamepad functionality.
-- [ ] **Tick Rate**: Customizable tick rate for Tap-Hold and Dynamic Keystroke.
 
 ## Limitations
 
