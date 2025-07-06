@@ -195,7 +195,7 @@ uint32_t board_serial(uint16_t *buf) {
 uint32_t board_cycle_count(void) { return DWT->CYCCNT; }
 
 //--------------------------------------------------------------------+
-// HAL Callbacks
+// Interrupt Handlers
 //--------------------------------------------------------------------+
 
 void SysTick_Handler(void) { HAL_IncTick(); }

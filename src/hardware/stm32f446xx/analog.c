@@ -223,7 +223,7 @@ void analog_task(void) {}
 uint16_t analog_read(uint8_t key) { return adc_values[key]; }
 
 //--------------------------------------------------------------------+
-// HAL Callbacks
+// Interrupt Handlers
 //--------------------------------------------------------------------+
 
 void ADC_IRQHandler(void) { HAL_ADC_IRQHandler(&adc_handle); }
