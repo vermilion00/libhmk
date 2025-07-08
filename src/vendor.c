@@ -64,6 +64,7 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
     default:
       break;
     }
+    break;
 
   case TUSB_REQ_TYPE_CLASS:
     switch (request->bRequest) {
