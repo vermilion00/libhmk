@@ -35,12 +35,17 @@
 
 // HID buffer size. Must be strictly large than all report sizes
 #define CFG_TUD_HID_EP_BUFSIZE 64
-#define CFG_TUD_VENDOR_EPSIZE 64
 
 #if defined(BOARD_USB_FS)
 #define BOARD_TUD_RHPORT 0
+#define CFG_TUD_VENDOR_EPSIZE 64
+#define CFG_TUD_VENDOR_RX_BUFSIZE 64
+#define CFG_TUD_VENDOR_TX_BUFSIZE 64
 #elif defined(BOARD_USB_HS)
 #define BOARD_TUD_RHPORT 1
+#define CFG_TUD_VENDOR_EPSIZE 512
+#define CFG_TUD_VENDOR_RX_BUFSIZE 512
+#define CFG_TUD_VENDOR_TX_BUFSIZE 512
 #else
 #error "USB peripheral not defined"
 #endif

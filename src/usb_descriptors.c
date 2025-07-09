@@ -80,6 +80,27 @@ static const uint8_t desc_configuration[] = {
 _Static_assert(M_ARRAY_SIZE(desc_configuration) == CONFIG_TOTAL_LEN,
                "Invalid configuration descriptor size");
 
+#if defined(BOARD_USB_HS)
+// Device qualifier descriptor for USB HS
+static const tusb_desc_device_qualifier_t desc_device_qualifier = {
+    .bLength = sizeof(tusb_desc_device_qualifier_t),
+    .bDescriptorType = TUSB_DESC_DEVICE_QUALIFIER,
+    .bcdUSB = 0x0210,
+
+    .bDeviceClass = 0x00,
+    .bDeviceSubClass = 0x00,
+    .bDeviceProtocol = 0x00,
+
+    .bMaxPacketSize0 = CFG_TUD_ENDPOINT0_SIZE,
+    .bNumConfigurations = 0x01,
+    .bReserved = 0x00,
+};
+
+// Other speed configuration descriptor for USB HS. Same as the main
+// configuration descriptor
+static uint8_t desc_other_speed_config[CONFIG_TOTAL_LEN];
+#endif
+
 #define BOS_TOTAL_LEN                                                          \
   (TUD_BOS_DESC_LEN + TUD_BOS_WEBUSB_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
@@ -323,6 +344,19 @@ const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {
   // We only have one configuration so we don't need to check the index
   return desc_configuration;
 }
+
+#if defined(BOARD_USB_HS)
+const uint8_t *tud_descriptor_device_qualifier_cb(void) {
+  return (const uint8_t *)&desc_device_qualifier;
+}
+
+const uint8_t *tud_descriptor_other_speed_configuration_cb(uint8_t index) {
+  memcpy(desc_other_speed_config, desc_configuration, CONFIG_TOTAL_LEN);
+  desc_other_speed_config[1] = TUSB_DESC_OTHER_SPEED_CONFIG;
+
+  return desc_other_speed_config;
+}
+#endif
 
 const uint8_t *tud_descriptor_bos_cb(void) { return desc_bos; }
 
