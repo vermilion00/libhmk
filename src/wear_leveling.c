@@ -59,7 +59,9 @@ wear_leveling_flash_write(uint32_t addr, const void *buf, uint32_t len) {
 
 static void wear_leveling_clear_cache(void) {
   // Fill the cache with flash empty values
-  memset(wl_cache, FLASH_EMPTY_VAL & 0xFF, WL_VIRTUAL_SIZE);
+  uint32_t *wl_cache32 = (uint32_t *)wl_cache;
+  for (uint32_t i = 0; i < WL_VIRTUAL_SIZE / 4; i++)
+    wl_cache32[i] = FLASH_EMPTY_VAL;
   // Skip the first 4 bytes reserved for CRC32 checksum of the consolidated data
   write_address = WL_VIRTUAL_SIZE + 4;
 }
