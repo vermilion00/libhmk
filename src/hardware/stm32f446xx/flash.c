@@ -52,7 +52,7 @@ bool flash_erase(uint32_t sector) {
 }
 
 bool flash_read(uint32_t addr, void *buf, uint32_t len) {
-  if (addr + len > FLASH_SIZE)
+  if (addr + len * 4 > FLASH_SIZE)
     return false;
 
   memcpy(buf, (void *)(FLASH_BASE + addr), len * 4);
@@ -61,7 +61,7 @@ bool flash_read(uint32_t addr, void *buf, uint32_t len) {
 }
 
 bool flash_write(uint32_t addr, const void *buf, uint32_t len) {
-  if (addr + len > FLASH_SIZE)
+  if (addr + len * 4 > FLASH_SIZE)
     return false;
 
   const uint32_t *buf32 = buf;
