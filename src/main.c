@@ -26,7 +26,9 @@
 #include "wear_leveling.h"
 
 int main(void) {
+#if defined(LOG_ENABLED)
   log_init();
+#endif
 
   // Initialize the hardware
   board_init();
@@ -54,6 +56,9 @@ int main(void) {
     analog_task();
     matrix_scan();
     layout_task();
+#if defined(LOG_ENABLED)
+    log_task();
+#endif
   }
 
   return 0;

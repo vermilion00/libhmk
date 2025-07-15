@@ -101,8 +101,25 @@ static const uint8_t desc_raw_hid_report[] = {
 
 };
 
+#if defined(LOG_ENABLED)
+// HID report descriptor for the log interface
+static const uint8_t desc_log_report[] = {
+    HID_USAGE_PAGE_N(LOG_USAGE_PAGE, 2), HID_USAGE(LOG_USAGE),
+    HID_COLLECTION(HID_COLLECTION_APPLICATION),
+
+    // Data to host
+    HID_USAGE(LOG_USAGE + 1), HID_LOGICAL_MIN(0), HID_LOGICAL_MAX_N(255, 2),
+    HID_REPORT_COUNT(LOG_EP_SIZE), HID_REPORT_SIZE(8),
+    HID_INPUT(HID_DATA | HID_VARIABLE | HID_ABSOLUTE), HID_COLLECTION_END
+
+};
+
+#define CONFIG_TOTAL_LEN                                                       \
+  (TUD_CONFIG_DESC_LEN + 3 * TUD_HID_DESC_LEN + TUD_HID_INOUT_DESC_LEN)
+#else
 #define CONFIG_TOTAL_LEN                                                       \
   (TUD_CONFIG_DESC_LEN + 2 * TUD_HID_DESC_LEN + TUD_HID_INOUT_DESC_LEN)
+#endif
 
 #define EP_IN(x) ((x) | 0x80)
 #define EP_OUT(x) (x)
@@ -124,6 +141,11 @@ static const uint8_t desc_configuration[] = {
     TUD_HID_INOUT_DESCRIPTOR(USB_ITF_RAW_HID, 0, HID_ITF_PROTOCOL_NONE,
                              sizeof(desc_raw_hid_report), EP_OUT(3), EP_IN(3),
                              RAW_HID_EP_SIZE, 1),
+#if defined(LOG_ENABLED)
+    // Log interface descriptor. Request highest polling interval
+    TUD_HID_DESCRIPTOR(USB_ITF_LOG, 0, HID_ITF_PROTOCOL_NONE,
+                       sizeof(desc_log_report), EP_IN(4), LOG_EP_SIZE, 1),
+#endif
 };
 
 _Static_assert(M_ARRAY_SIZE(desc_configuration) == CONFIG_TOTAL_LEN,
@@ -183,6 +205,11 @@ const uint8_t *tud_hid_descriptor_report_cb(uint8_t instance) {
 
   case USB_ITF_RAW_HID:
     return desc_raw_hid_report;
+
+#if defined(LOG_ENABLED)
+  case USB_ITF_LOG:
+    return desc_log_report;
+#endif
 
   default:
     // Invalid interface, should be unreachable

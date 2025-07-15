@@ -16,39 +16,53 @@
 #include "log.h"
 
 #if defined(LOG_ENABLED)
-#include <stdarg.h>
-#include <stdio.h>
+#include "printf/printf.h"
+#include "tusb.h"
+#include "usb_descriptors.h"
 
-char log_buffer[LOG_BUFFER_SIZE];
 uint32_t log_buffer_size;
+char log_buffer[LOG_EP_SIZE];
+
+/**
+ * @brief Flush the log buffer if the buffer is not empty
+ *
+ * @return None
+ */
+static void log_flush(void) {
+  if (log_buffer_size == 0)
+    return;
+
+  while (!tud_hid_n_ready(USB_ITF_LOG))
+    // Wait for the log interface to be ready
+    tud_task();
+  tud_hid_n_report(USB_ITF_LOG, 0, log_buffer, LOG_EP_SIZE);
+
+  log_buffer_size = 0;
+  memset(log_buffer, 0, LOG_EP_SIZE);
+}
 
 void log_init(void) {}
 
-void log_printf(const char *fmt, ...) {
-  if (log_buffer_size >= LOG_BUFFER_SIZE - 1)
-    // Buffer is full, cannot log more
-    return;
-
+int log_printf(const char *fmt, ...) {
   va_list args;
 
   va_start(args, fmt);
-  int len = vsnprintf(NULL, 0, fmt, args);
+  const int ret = vprintf_(fmt, args);
   va_end(args);
 
-  if (len <= 0)
-    // Invalid length
-    return;
-
-  va_start(args, fmt);
-  vsnprintf(log_buffer + log_buffer_size, LOG_BUFFER_SIZE - log_buffer_size,
-            fmt, args);
-  va_end(args);
-
-  log_buffer_size += len;
+  return ret;
 }
 
-void log_clear(void) {
-  log_buffer[0] = '\0';
-  log_buffer_size = 0;
+void log_task(void) { log_flush(); }
+
+//--------------------------------------------------------------------+
+// Printf Backend
+//--------------------------------------------------------------------+
+
+void putchar_(char c) {
+  if (log_buffer_size >= LOG_EP_SIZE)
+    // Buffer is full, flush it
+    log_flush();
+  log_buffer[log_buffer_size++] = c;
 }
 #endif

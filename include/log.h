@@ -17,30 +17,11 @@
 
 #include "common.h"
 
-#if defined(LOG_ENABLED)
-//--------------------------------------------------------------------+
-// Log Configuration
-//--------------------------------------------------------------------+
-
-#if !defined(LOG_BUFFER_SIZE)
-// Buffer for log messages. This should be large enough to hold the
-// messages that will be sent through WebUSB.
-#define LOG_BUFFER_SIZE 1024
-#endif
-
-//--------------------------------------------------------------------+
-// Log Buffer
-//--------------------------------------------------------------------+
-
-// Null-terminated buffer for log messages
-extern char log_buffer[LOG_BUFFER_SIZE];
-// Size of the log buffer
-extern uint32_t log_buffer_size;
-
 //--------------------------------------------------------------------+
 // Log API
 //--------------------------------------------------------------------+
 
+#if defined(LOG_ENABLED)
 /**
  * @brief Initialize the log module
  *
@@ -49,23 +30,19 @@ extern uint32_t log_buffer_size;
 void log_init(void);
 
 /**
- * @brief Log a format string to the buffer
+ * @brief Log a format string to the log interface
  *
  * @param fmt Format string (printf-style)
  * @param ... Arguments for the format string
  *
- * @return None
+ * @return Number of characters logged
  */
-void log_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+int log_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 /**
- * @brief Clear the log buffer
+ * @brief Log task
  *
  * @return None
  */
-void log_clear(void);
-#else
-#define log_init()
-#define log_printf(fmt, ...)
-#define log_clear()
+void log_task(void);
 #endif

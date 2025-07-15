@@ -55,6 +55,9 @@ enum {
   USB_ITF_KEYBOARD = 0,
   USB_ITF_HID,
   USB_ITF_RAW_HID,
+#if defined(LOG_ENABLED)
+  USB_ITF_LOG,
+#endif
   USB_ITF_COUNT,
 };
 
@@ -91,3 +94,15 @@ typedef struct __attribute__((packed)) {
 #define RAW_HID_USAGE_PAGE 0xFFAB
 // Vendor defined usage ID
 #define RAW_HID_USAGE 0xAB
+
+//--------------------------------------------------------------------+
+// Log HID Report
+//--------------------------------------------------------------------+
+
+#if defined(LOG_ENABLED)
+#define LOG_EP_SIZE 32
+// Vendor defined usage page (PJRC Teensy compatible)
+#define LOG_USAGE_PAGE 0xFF31
+// Vendor defined usage ID (PJRC Teensy compatible)
+#define LOG_USAGE 0x74
+#endif

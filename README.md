@@ -71,6 +71,24 @@ git clone https://github.com/peppapighs/libhmk.git
 
 8. Configure the keyboard using [hmkconf](https://github.com/peppapighs/hmkconf).
 
+## Debugging
+
+In addition to the debugging options provided by PlatformIO, you can use the `log_printf` function to log messages to the console. This function is available when:
+
+- The `LOG_ENABLED` macro is defined in the keyboard's `config.h` file, or in `platformio.ini` under the `build_flags` section.
+- The `printf` library is included in `platformio.ini` under the `lib_deps` section as follows:
+
+  ```patch
+  ...
+  - lib_deps = https://github.com/hathach/tinyusb.git#0.18.0
+  + lib_deps =
+  +   https://github.com/hathach/tinyusb.git#0.18.0
+  +   https://github.com/peppapighs/printf.git
+  ...
+  ```
+
+The log messages will be sent to the HID interface, which can be viewed in [hid_listen](https://www.pjrc.com/teensy/hid_listen.html), [QMK CLI](https://docs.qmk.fm/cli_commands#qmk-console), or [QMK Toolbox](https://qmk.fm/toolbox) (buggy, not recommended).
+
 ## Porting
 
 See [`hardware/stm32f446xx`](hardware/stm32f446xx/) and [`src/hardware/stm32f446xx`](src/hardware/stm32f446xx/) for an example implementation of the hardware-specific code for the STM32F446xx microcontroller.
