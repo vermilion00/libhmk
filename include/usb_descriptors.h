@@ -85,6 +85,11 @@ typedef struct __attribute__((packed)) {
   uint8_t bitmap[NUM_NKRO_BYTES];
 } hid_nkro_kb_report_t;
 
+// Strictly larger since this report belongs to an interface with multiple
+// reports, so the first byte is reserved for the report ID
+_Static_assert(sizeof(hid_nkro_kb_report_t) < CFG_TUD_HID_EP_BUFSIZE,
+               "Invalid NKRO report size");
+
 //--------------------------------------------------------------------+
 // Raw HID Report
 //--------------------------------------------------------------------+
@@ -94,6 +99,11 @@ typedef struct __attribute__((packed)) {
 #define RAW_HID_USAGE_PAGE 0xFFAB
 // Vendor defined usage ID
 #define RAW_HID_USAGE 0xAB
+
+// Otherwise, SET_REPORT callback will only be called when TinyUSB endpoint
+// buffer is full, resulting in missed reports.
+_Static_assert(RAW_HID_EP_SIZE == CFG_TUD_HID_EP_BUFSIZE,
+               "Invalid Raw HID report size");
 
 //--------------------------------------------------------------------+
 // Log HID Report
