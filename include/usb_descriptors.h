@@ -54,6 +54,7 @@ enum {
   // Separate interface for keyboard to support boot protocol
   USB_ITF_KEYBOARD = 0,
   USB_ITF_HID,
+  USB_ITF_RAW_HID,
   USB_ITF_COUNT,
 };
 
@@ -80,3 +81,13 @@ typedef struct __attribute__((packed)) {
   uint8_t keycodes[6];
   uint8_t bitmap[NUM_NKRO_BYTES];
 } hid_nkro_kb_report_t;
+
+//--------------------------------------------------------------------+
+// Raw HID Report
+//--------------------------------------------------------------------+
+
+#define RAW_HID_EP_SIZE 32
+// Vendor defined usage page
+#define RAW_HID_USAGE_PAGE 0xFFAB
+// Vendor defined usage ID
+#define RAW_HID_USAGE 0xAB
