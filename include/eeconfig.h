@@ -135,28 +135,38 @@ bool eeconfig_set_current_profile(uint8_t profile);
  * @brief Set the keymap for a profile
  *
  * @param profile Profile index
- * @param keymap New keymap
+ * @param layer Layer index
+ * @param start Starting key index
+ * @param len Length of the partial keymap
+ * @param keymap New partial keymap
  *
  * @return true if successful, false otherwise
  */
-bool eeconfig_set_keymap(uint8_t profile, const void *keymap);
+bool eeconfig_set_keymap(uint8_t profile, uint8_t layer, uint8_t start,
+                         uint8_t len, const void *keymap);
 
 /**
  * @brief Set the actuation map for a profile
  *
  * @param profile Profile index
- * @param actuation_map New actuation map
+ * @param start Starting key index
+ * @param len Length of the partial actuation map
+ * @param actuation_map New partial actuation map
  *
  * @return true if successful, false otherwise
  */
-bool eeconfig_set_actuation_map(uint8_t profile, const void *actuation_map);
+bool eeconfig_set_actuation_map(uint8_t profile, uint8_t start, uint8_t len,
+                                const void *actuation_map);
 
 /**
  * @brief Set the advanced keys for a profile
  *
  * @param profile Profile index
- * @param advanced_keys New advanced keys
+ * @param start Starting advanced key index
+ * @param len Length of the partial advanced keys
+ * @param advanced_keys New partial advanced keys
  *
  * @return true if successful, false otherwise
  */
-bool eeconfig_set_advanced_keys(uint8_t profile, const void *advanced_keys);
+bool eeconfig_set_advanced_keys(uint8_t profile, uint8_t start, uint8_t len,
+                                const void *advanced_keys);

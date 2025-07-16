@@ -14,6 +14,7 @@
  */
 
 #include "advanced_keys.h"
+#include "commands.h"
 #include "crc32.h"
 #include "deferred_actions.h"
 #include "eeconfig.h"
@@ -47,6 +48,7 @@ int main(void) {
   deferred_action_init();
   advanced_key_init();
   layout_init();
+  command_init();
 
   tud_init(BOARD_TUD_RHPORT);
 
