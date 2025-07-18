@@ -94,7 +94,7 @@ _Static_assert(sizeof(hid_nkro_kb_report_t) < CFG_TUD_HID_EP_BUFSIZE,
 // Raw HID Report
 //--------------------------------------------------------------------+
 
-#define RAW_HID_EP_SIZE 32
+#define RAW_HID_EP_SIZE 64
 // Vendor defined usage page
 #define RAW_HID_USAGE_PAGE 0xFFAB
 // Vendor defined usage ID

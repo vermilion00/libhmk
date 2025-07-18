@@ -39,7 +39,7 @@
 
 // HID buffer size. Must be at least the size of the largest reports (+1 for
 // interface with multiple reports)
-#define CFG_TUD_HID_EP_BUFSIZE 32
+#define CFG_TUD_HID_EP_BUFSIZE 64
 
 #if defined(BOARD_USB_FS)
 #define BOARD_TUD_RHPORT 0
