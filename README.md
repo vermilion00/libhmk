@@ -67,9 +67,13 @@ git clone https://github.com/peppapighs/libhmk.git
 
 6. Build the firmware using PlatformIO.
 
-7. Flash the firmware to your keyboard through PlatformIO, the bootloader of your keyboard, or any other method.
+7. Flash the firmware to your keyboard through PlatformIO upload, the bootloader of your keyboard, or any other method.
 
 8. Configure the keyboard using [hmkconf](https://github.com/peppapighs/hmkconf).
+
+## Development
+
+The development branch is `dev`, which contains the latest features and bug fixes. The corresponding `dev` branch of [hmkconf](https://github.com/peppapighs/hmkconf/tree/dev) deployed at [https://hmkdev.prasertsuk.com](https://hmkdev.prasertsuk.com) is required to configure the `dev` branch of the firmware. To contribute, please create a pull request against the `dev` branch.
 
 ## Debugging
 
