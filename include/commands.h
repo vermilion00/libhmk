@@ -59,7 +59,8 @@ typedef struct __attribute__((packed)) {
 //---------------------------------------------------------------------+
 
 // Number of entries that can be sent in a single command
-#define COMMAND_PARTIAL_SIZE(size) ((RAW_HID_EP_SIZE - 1) / (size))
+#define COMMAND_PARTIAL_SIZE(size, header_size)                                \
+  ((RAW_HID_EP_SIZE - 1 - header_size) / (size))
 
 //---------------------------------------------------------------------+
 // Command API

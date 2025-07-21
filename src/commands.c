@@ -54,7 +54,7 @@ void command_process(const uint8_t *buf) {
   }
   case COMMAND_ANALOG_INFO: {
     const uint8_t partial_size =
-        COMMAND_PARTIAL_SIZE(sizeof(command_analog_info_t));
+        COMMAND_PARTIAL_SIZE(sizeof(command_analog_info_t), 0);
     const uint8_t start = command_data[0] * partial_size;
     if (start >= NUM_KEYS) {
       // Invalid parameters
@@ -88,7 +88,7 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_GET_KEYMAP: {
-    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t));
+    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t), 0);
     const uint8_t profile = command_data[0];
     const uint8_t layer = command_data[1];
     const uint8_t start = command_data[2] * partial_size;
@@ -108,7 +108,7 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_SET_KEYMAP: {
-    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t));
+    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t), 4);
     const uint8_t profile = command_data[0];
     const uint8_t layer = command_data[1];
     const uint8_t start = command_data[2];
@@ -125,7 +125,7 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_GET_ACTUATION_MAP: {
-    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(actuation_t));
+    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(actuation_t), 0);
     const uint8_t profile = command_data[0];
     const uint8_t start = command_data[1] * partial_size;
 
@@ -144,7 +144,7 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_SET_ACTUATION_MAP: {
-    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(actuation_t));
+    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(actuation_t), 3);
     const uint8_t profile = command_data[0];
     const uint8_t start = command_data[1];
     const uint8_t len = command_data[2];
@@ -160,7 +160,8 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_GET_ADVANCED_KEYS: {
-    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(advanced_key_t));
+    const uint8_t partial_size =
+        COMMAND_PARTIAL_SIZE(sizeof(advanced_key_t), 0);
     const uint8_t profile = command_data[0];
     const uint8_t start = command_data[1] * partial_size;
 
@@ -179,7 +180,8 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_SET_ADVANCED_KEYS: {
-    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(advanced_key_t));
+    const uint8_t partial_size =
+        COMMAND_PARTIAL_SIZE(sizeof(advanced_key_t), 3);
     const uint8_t profile = command_data[0];
     const uint8_t start = command_data[1];
     const uint8_t len = command_data[2];
