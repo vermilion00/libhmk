@@ -21,50 +21,6 @@
 // Analog Configuration
 //--------------------------------------------------------------------+
 
-#if ADC_RESOLUTION == 12
-// ADC resolution in HAL format
-#define ADC_RESOLUTION_HAL ADC_RESOLUTION_12B
-#elif ADC_RESOLUTION == 10
-// ADC resolution in HAL format
-#define ADC_RESOLUTION_HAL ADC_RESOLUTION_10B
-#elif ADC_RESOLUTION == 8
-// ADC resolution in HAL format
-#define ADC_RESOLUTION_HAL ADC_RESOLUTION_8B
-#elif ADC_RESOLUTION == 6
-// ADC resolution in HAL format
-#define ADC_RESOLUTION_HAL ADC_RESOLUTION_6B
-#else
-#error "Invalid ADC resolution"
-#endif
-
-#if ADC_NUM_SAMPLE_CYCLES == 3
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_3CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 15
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_15CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 28
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_28CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 56
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_56CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 84
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_84CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 112
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_112CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 144
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_144CYCLES
-#elif ADC_NUM_SAMPLE_CYCLES == 480
-// Number of sample cycles in HAL format
-#define ADC_SAMPLE_CYCLES_HAL ADC_SAMPLETIME_480CYCLES
-#else
-#error "Invalid number of sample cycles"
-#endif
-
 #if !defined(ADC_NUM_MUX_INPUTS)
 // Number of ADC inputs that are connected to the multiplexer
 #define ADC_NUM_MUX_INPUTS 0

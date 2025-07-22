@@ -112,7 +112,7 @@ void analog_init(void) {
   // Initialize the ADC peripheral
   adc_handle.Instance = ADC1;
   adc_handle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  adc_handle.Init.Resolution = ADC_RESOLUTION_HAL;
+  adc_handle.Init.Resolution = ADC_RESOLUTION;
   adc_handle.Init.ScanConvMode = ENABLE;
   adc_handle.Init.ContinuousConvMode = DISABLE;
   adc_handle.Init.DiscontinuousConvMode = DISABLE;
@@ -132,7 +132,7 @@ void analog_init(void) {
 
     channel_config.Channel = mux_input_channels[i];
     channel_config.Rank = i + 1;
-    channel_config.SamplingTime = ADC_SAMPLE_CYCLES_HAL;
+    channel_config.SamplingTime = ADC_NUM_SAMPLE_CYCLES;
     if (HAL_ADC_ConfigChannel(&adc_handle, &channel_config) != HAL_OK)
       board_error_handler();
 
@@ -163,7 +163,7 @@ void analog_init(void) {
 
     channel_config.Channel = raw_input_channels[i];
     channel_config.Rank = ADC_NUM_MUX_INPUTS + i + 1;
-    channel_config.SamplingTime = ADC_SAMPLE_CYCLES_HAL;
+    channel_config.SamplingTime = ADC_NUM_SAMPLE_CYCLES;
     if (HAL_ADC_ConfigChannel(&adc_handle, &channel_config) != HAL_OK)
       board_error_handler();
 

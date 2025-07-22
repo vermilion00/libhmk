@@ -44,13 +44,26 @@
 
 #if !defined(ADC_RESOLUTION)
 // ADC resolution in bits
-#define ADC_RESOLUTION 12
+#define ADC_RESOLUTION ADC_RESOLUTION_12B
 #endif
 
+#if ADC_RESOLUTION == ADC_RESOLUTION_12B
 // Maximum ADC value
-#define ADC_MAX_VALUE ((1 << ADC_RESOLUTION) - 1)
+#define ADC_MAX_VALUE 4095
+#elif ADC_RESOLUTION == ADC_RESOLUTION_10B
+// Maximum ADC value
+#define ADC_MAX_VALUE 1023
+#elif ADC_RESOLUTION == ADC_RESOLUTION_8B
+// Maximum ADC value
+#define ADC_MAX_VALUE 255
+#elif ADC_RESOLUTION == ADC_RESOLUTION_6B
+// Maximum ADC value
+#define ADC_MAX_VALUE 63
+#else
+#error "Invalid ADC resolution"
+#endif
 
 #if !defined(ADC_NUM_SAMPLE_CYCLES)
 // Number of sample cycles for each ADC conversion
-#define ADC_NUM_SAMPLE_CYCLES 3
+#define ADC_NUM_SAMPLE_CYCLES ADC_SAMPLETIME_3CYCLES
 #endif
