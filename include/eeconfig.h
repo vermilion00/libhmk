@@ -23,7 +23,7 @@
 //--------------------------------------------------------------------+
 
 // Persistent configuration version
-#define EECONFIG_VERSION 0x0100
+#define EECONFIG_VERSION 0x0101
 // Magic number to identify the start of the configuration
 #define EECONFIG_MAGIC_START 0x0A42494C
 // Magic number to identify the end of the configuration
