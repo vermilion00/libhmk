@@ -25,7 +25,7 @@ static const migration_func_t migration_funcs[] = {
 bool migration_try_migrate(void) {
   if (eeconfig->magic_start != EECONFIG_MAGIC_START)
     // The magic start is always the same for any version.
-    return true;
+    return false;
 
   const uint16_t config_version = eeconfig->version;
   for (uint32_t i = 0; i < M_ARRAY_SIZE(migration_funcs); i++) {
