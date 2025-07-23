@@ -18,6 +18,7 @@
 #include "advanced_keys.h"
 #include "keycodes.h"
 #include "layout.h"
+#include "migration.h"
 
 // Helper macro to update a field in the configuration
 #define EECONFIG_UPDATE(field, value)                                          \
@@ -38,11 +39,15 @@ static const eeconfig_t default_eeconfig = {
     .magic_end = EECONFIG_MAGIC_END,
 };
 
+static bool eeconfig_is_latest_version(void) {
+  return eeconfig->magic_start == EECONFIG_MAGIC_START &&
+         eeconfig->magic_end == EECONFIG_MAGIC_END &&
+         eeconfig->version == EECONFIG_VERSION;
+}
+
 void eeconfig_init(void) {
   eeconfig = (const eeconfig_t *)wl_cache;
-  if (eeconfig->magic_start != EECONFIG_MAGIC_START ||
-      eeconfig->magic_end != EECONFIG_MAGIC_END)
-    // If the configuration is invalid, reset it
+  if (!eeconfig_is_latest_version() && !migration_try_migrate())
     eeconfig_reset();
 }
 
