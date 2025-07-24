@@ -18,8 +18,10 @@
 #include "eeconfig.h"
 #include "wear_leveling.h"
 
+static bool migration_v1_0_to_v1_1(void *dst, const void *src);
+
 static const migration_func_t migration_funcs[] = {
-    {0x0101, NULL},
+    {.version = 0x0101, .migrate = migration_v1_0_to_v1_1},
 };
 
 bool migration_try_migrate(void) {
@@ -28,17 +30,68 @@ bool migration_try_migrate(void) {
     return false;
 
   const uint16_t config_version = eeconfig->version;
+  // We alternate between two buffers to save the memory.
+  uint8_t current_buf = 0;
+  uint8_t bufs[2][sizeof(eeconfig_t)];
+
+  // Let `bufs[0]` be the current configuration.
+  memcpy(bufs[0], eeconfig, sizeof(eeconfig_t));
   for (uint32_t i = 0; i < M_ARRAY_SIZE(migration_funcs); i++) {
-    if (migration_funcs[i].version <= config_version)
-      // Older versions
+    if (migration_funcs[i].version <= config_version ||
+        migration_funcs[i].migrate == NULL)
+      // Older versions, or no migration needed
       continue;
-    if (migration_funcs[i].migrate != NULL && !migration_funcs[i].migrate())
+
+    const uint8_t *src = bufs[current_buf];
+    uint8_t *dst = bufs[current_buf ^ 1];
+
+    if (!migration_funcs[i].migrate(dst, src))
       // Migration failed
       return false;
+
+    // Swap buffers for the next migration step
+    current_buf ^= 1;
   }
 
-  // `eeconfig` is updated, so we reflect the update in the flash.
-  wear_leveling_write(0, eeconfig, sizeof(eeconfig_t));
+  // We reflect the update in the flash.
+  wear_leveling_write(0, &bufs[current_buf], sizeof(eeconfig_t));
+
+  return true;
+}
+
+//--------------------------------------------------------------------+
+// v1.0 -> v1.1 Migration
+//--------------------------------------------------------------------+
+
+static bool migration_v1_0_to_v1_1(void *dst, const void *src) {
+  if (*(uint16_t *)(src + 4) != 0x0100)
+    // Not a v1.0 configuration, cannot migrate
+    return false;
+
+  const uint32_t profile_size = NUM_LAYERS * NUM_KEYS    // Keymap
+                                + NUM_KEYS * 4           // Actuation map
+                                + NUM_ADVANCED_KEYS * 12 // Advanced keys
+                                + 1;                     // Tick rate
+
+  // No changes in the structure, just copy the data.
+  memcpy(dst, src, sizeof(eeconfig_t));
+
+  for (uint32_t i = 0; i < NUM_PROFILES; i++) {
+    for (uint32_t j = 0; j < NUM_ADVANCED_KEYS; j++) {
+      const uint8_t *ak = dst + 12                // Headers and options
+                          + i * profile_size      // Profiles
+                          + NUM_LAYERS * NUM_KEYS // Keymap
+                          + NUM_KEYS * 4          // Actuation map
+                          + j * 12;               // Advanced keys
+      if (*(ak + 2) == AK_TYPE_TAP_HOLD)
+        // Default hold on other key press to false
+        *(bool *)(ak + 7) = false;
+    }
+  }
+
+  // Update the version to 1.1
+  ((eeconfig_t *)dst)->version = 0x0101;
+  ((eeconfig_t *)dst)->magic_end = EECONFIG_MAGIC_END;
 
   return true;
 }

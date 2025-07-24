@@ -25,11 +25,11 @@ typedef struct {
   // Persistent configuration version
   uint16_t version;
   // Function to migrate the persistent configuration from the previous version.
-  // The function should modify `eeconfig` to reflect the new version without
-  // having to write to the flash. The function should return true if the
-  // migration was successful, false otherwise. If the function is NULL, no
-  // migration is performed for that version.
-  bool (*migrate)(void);
+  // The function should migrate `src` to `dst` without having to write to the
+  // flash. The function should return true if the migration was successful,
+  // false otherwise. If the function is NULL, no migration is performed for
+  // that version.
+  bool (*migrate)(void *dst, const void *src);
 } migration_func_t;
 
 //--------------------------------------------------------------------+

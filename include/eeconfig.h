@@ -22,7 +22,9 @@
 // Keyboard Persistent Configuration
 //--------------------------------------------------------------------+
 
-// Persistent configuration version
+// Persistent configuration version. The size of the configuration must be
+// non-decreasing, so that the migration can assume that the new version is at
+// least as large as the previous version.
 #define EECONFIG_VERSION 0x0101
 // Magic number to identify the start of the configuration
 #define EECONFIG_MAGIC_START 0x0A42494C
@@ -51,6 +53,7 @@ typedef struct __attribute__((packed)) {
   advanced_key_t advanced_keys[NUM_ADVANCED_KEYS];
   uint8_t tick_rate;
 } eeconfig_profile_t;
+
 // Keyboard configuration
 typedef struct __attribute__((packed)) {
   uint32_t magic_start;
