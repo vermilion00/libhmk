@@ -87,7 +87,7 @@ In addition to the debugging options provided by PlatformIO, you can use the `lo
   - lib_deps = https://github.com/hathach/tinyusb.git#0.18.0
   + lib_deps =
   +   https://github.com/hathach/tinyusb.git#0.18.0
-  +   https://github.com/peppapighs/printf.git
+  +   https://github.com/eyalroz/printf.git#develop
   ...
   ```
 
