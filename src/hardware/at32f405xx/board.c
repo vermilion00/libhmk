@@ -26,11 +26,11 @@
 static void board_clock_init(void) {
   // Reset the CRM
   crm_reset();
-  // Configure flash PSR register
+  // Configure flash PSR register with 6 wait states for 216MHz system clock
   flash_psr_set(FLASH_WAIT_CYCLE_6);
   // Enable PWC peripheral clock
   crm_periph_clock_enable(CRM_PWC_PERIPH_CLOCK, TRUE);
-  // Set power LDO output voltage to 1.3V
+  // Set power LDO output voltage to 1.3V to support 216MHz system clock
   pwc_ldo_output_voltage_set(PWC_LDO_OUTPUT_1V3);
   // Set clock source to HSE
   crm_clock_source_enable(CRM_CLOCK_SOURCE_HEXT, TRUE);
@@ -39,11 +39,11 @@ static void board_clock_init(void) {
   while (crm_hext_stable_wait() == ERROR)
     ;
 
-  // Configure PLL
+  // Configure PLL to 216MHz, assuming HSE is 12MHz
   crm_pll_config(CRM_PLL_SOURCE_HEXT, 72, 1, CRM_PLL_FP_4);
-  // Configure USB clock divider
+  // Configure PLLU to 48MHz for USB FS
   crm_pllu_div_set(CRM_PLL_FU_18);
-  // Enable PLL
+  // Enable PLL as system clock source
   crm_clock_source_enable(CRM_CLOCK_SOURCE_PLL, TRUE);
 
   // Wait for PLL to stabilize
@@ -56,18 +56,18 @@ static void board_clock_init(void) {
   crm_apb2_div_set(CRM_APB2_DIV_1);
   // Configure APB1 clock
   crm_apb1_div_set(CRM_APB1_DIV_2);
-  // Enable auto step mode
+  // Enable auto step mode before switching system clock source to PLL
   crm_auto_step_mode_enable(TRUE);
   // Select PLL as system clock source
   crm_sysclk_switch(CRM_SCLK_PLL);
 
-  // Wait for system clock to switch
+  // Wait for system clock to finish switching
   while (crm_sysclk_switch_status_get() != CRM_SCLK_PLL)
     ;
 
-  // Disable auto step mode
+  // Disable auto step mode after switching system clock source
   crm_auto_step_mode_enable(FALSE);
-  // Update system core clock
+  // Update system core clock variable
   system_core_clock_update();
 }
 
@@ -78,29 +78,36 @@ static void board_clock_init(void) {
  * @return None
  */
 static void board_reduce_power_consumption(void) {
-  volatile uint32_t delay = 0x34BC0;
+  volatile uint32_t delay = F_CPU / 1000;
 
-  if (CRM->ctrl_bit.hextstbl) {
-    *(__IO uint32_t *)0x40023878 = 0x00;
-  } else if (CRM->ctrl_bit.pllstbl == SET) {
-    CRM->pllcfg_bit.plluen = TRUE;
-    while (CRM->ctrl_bit.pllstbl != SET || CRM->ctrl_bit.pllustbl != SET)
-      ;
-    *(__IO uint32_t *)0x40023878 = 0x10;
-  } else {
-    return;
-  }
-  CRM->ahben1 |= 1 << 29;
-  *(__IO uint32_t *)0x40040038 = 0x210000;
-  *(__IO uint32_t *)0x4004000C |= 0x40000000;
-  *(__IO uint32_t *)0x40040804 &= ~0x2;
+  // Wait for HSE to stabilize
+  while (crm_hext_stable_wait() == ERROR)
+    ;
+
+  // Configure HS PHY clock source to HSE to support power down
+  crm_usb_phy12_clock_select(CRM_USB_PHY12_CLOCK_HEXT_DIV_1);
+  crm_periph_clock_enable(CRM_OTGHS_PERIPH_CLOCK, TRUE);
+
+  // Enable power down mode
+  OTG2_GLOBAL->gccfg_bit.pwrdown = TRUE;
+  OTG2_GLOBAL->gccfg_bit.vbusig = TRUE;
+
+  // Set USB mode to device
+  usb_global_set_mode(OTG2_GLOBAL, OTG_DEVICE_MODE);
+  usb_connect(OTG2_GLOBAL);
+
+  // Roughly 1ms delay to enter suspend mode
   while (delay--) {
-    if (*(__IO uint32_t *)0x40040808 & 0x1)
+    if (usb_suspend_status_get(OTG2_GLOBAL) == SET)
       break;
   }
-  *(__IO uint32_t *)0x40040038 |= 0x400000;
-  *(__IO uint32_t *)0x40040E00 |= 0x1;
-  *(__IO uint32_t *)0x40040038 &= ~0x10000;
+
+  // Wait for HS PHY clock source to stabilize
+  OTG2_GLOBAL->gccfg_bit.wait_clk_rcv = TRUE;
+  // Stop USB PHY clock to reduce power consumption
+  usb_stop_phy_clk(OTG2_GLOBAL);
+  // Disable power down mode
+  OTG2_GLOBAL->gccfg_bit.pwrdown = FALSE;
 }
 #endif
 
