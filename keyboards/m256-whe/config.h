@@ -123,26 +123,3 @@
           _______, _______, _______, _______, _______,                         \
       },                                                                       \
   }
-
-#define DEFAULT_ACTUATION_MAP                                                  \
-  {                                                                            \
-      [0 ... NUM_KEYS - 1] =                                                   \
-          {                                                                    \
-              .actuation_point = 128,                                          \
-              .rt_down = 0,                                                    \
-              .rt_up = 0,                                                      \
-              .continuous = false,                                             \
-          },                                                                   \
-  }
-
-#define DEFAULT_ADVANCED_KEYS                                                  \
-  {                                                                            \
-  }
-
-#define DEFAULT_PROFILE                                                        \
-  {                                                                            \
-      .keymap = DEFAULT_KEYMAP,                                                \
-      .actuation_map = DEFAULT_ACTUATION_MAP,                                  \
-      .advanced_keys = DEFAULT_ADVANCED_KEYS,                                  \
-      .tick_rate = 30,                                                         \
-  }

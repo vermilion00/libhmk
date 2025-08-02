@@ -25,6 +25,7 @@
 #include "matrix.h"
 #include "tusb.h"
 #include "wear_leveling.h"
+#include "xinput.h"
 
 int main(void) {
 #if defined(LOG_ENABLED)
@@ -47,6 +48,7 @@ int main(void) {
   hid_init();
   deferred_action_init();
   advanced_key_init();
+  xinput_init();
   layout_init();
   command_init();
 
@@ -58,6 +60,7 @@ int main(void) {
     analog_task();
     matrix_scan();
     layout_task();
+    xinput_task();
 #if defined(LOG_ENABLED)
     log_task();
 #endif

@@ -46,25 +46,50 @@ typedef struct __attribute__((packed)) {
   uint16_t initial_bottom_out_threshold;
 } eeconfig_calibration_t;
 
+// Keyboard options configuration
+typedef union {
+  struct __attribute__((packed)) {
+    // Whether the XInput interface is enabled
+    bool xinput_enabled : 1;
+    // Reserved bits for future use
+    uint16_t reserved : 15;
+  };
+  uint16_t raw;
+} eeconfig_options_t;
+
 // Keyboard profile configuration
 typedef struct __attribute__((packed)) {
   uint8_t keymap[NUM_LAYERS][NUM_KEYS];
   actuation_t actuation_map[NUM_KEYS];
   advanced_key_t advanced_keys[NUM_ADVANCED_KEYS];
+  uint8_t gamepad_buttons[NUM_KEYS];
+  gamepad_options_t gamepad_options;
   uint8_t tick_rate;
 } eeconfig_profile_t;
 
 // Keyboard configuration
 typedef struct __attribute__((packed)) {
+  // Global configurations
+  // Magic number to identify the start of the configuration
   uint32_t magic_start;
+  // Version of the configuration
   uint16_t version;
 
+  // Calibration configuration
   eeconfig_calibration_t calibration;
+  // Options configuration
+  eeconfig_options_t options;
 
+  // Current profile index
   uint8_t current_profile;
+  // Last non-default profile index, used for profile swapping
   uint8_t last_non_default_profile;
+  // End of global configurations
+
+  // Profiles
   eeconfig_profile_t profiles[NUM_PROFILES];
 
+  // Magic number to identify the end of the configuration
   uint32_t magic_end;
 } eeconfig_t;
 
@@ -84,8 +109,72 @@ extern const eeconfig_t *eeconfig;
 #error "DEFAULT_CALIBRATION is not defined"
 #endif
 
+#if !defined(DEFAULT_OPTIONS)
+#define DEFAULT_OPTIONS                                                        \
+  {                                                                            \
+  }
+#endif
+
+#if !defined(DEFAULT_KEYMAP)
+// Default keymap
+#define DEFAULT_KEYMAP                                                         \
+  {                                                                            \
+    [0 ... NUM_LAYERS - 1] = { [0 ... NUM_KEYS - 1] = KC_NO }                  \
+  }
+#endif
+
+#if !defined(DEFAULT_ACTUATION_MAP)
+// Default actuation map
+#define DEFAULT_ACTUATION_MAP                                                  \
+  {                                                                            \
+      [0 ... NUM_KEYS - 1] =                                                   \
+          {                                                                    \
+              .actuation_point = 128,                                          \
+              .rt_down = 0,                                                    \
+              .rt_up = 0,                                                      \
+              .continuous = false,                                             \
+          },                                                                   \
+  }
+#endif
+
+#if !defined(DEFAULT_ADVANCED_KEYS)
+// Default advanced keys
+#define DEFAULT_ADVANCED_KEYS                                                  \
+  {                                                                            \
+  }
+#endif
+
+#if !defined(DEFAULT_GAMEPAD_BUTTONS)
+// Default gamepad buttons
+#define DEFAULT_GAMEPAD_BUTTONS {[0 ... NUM_KEYS - 1] = GP_BUTTON_NONE}
+#endif
+
+#if !defined(DEFAULT_GAMEPAD_OPTIONS)
+// Default gamepad options
+#define DEFAULT_GAMEPAD_OPTIONS                                                \
+  {                                                                            \
+      .analog_curve = {{4, 20}, {85, 95}, {165, 170}, {255, 255}},             \
+      .keyboard_enabled = true,                                                \
+      .snappy_joystick = true,                                                 \
+  }
+#endif
+
+#if !defined(DEFAULT_TICK_RATE)
+// Default tick rate
+#define DEFAULT_TICK_RATE 30
+#endif
+
 #if !defined(DEFAULT_PROFILE)
-#error "DEFAULT_PROFILE is not defined"
+// Default profile
+#define DEFAULT_PROFILE                                                        \
+  {                                                                            \
+      .keymap = DEFAULT_KEYMAP,                                                \
+      .actuation_map = DEFAULT_ACTUATION_MAP,                                  \
+      .advanced_keys = DEFAULT_ADVANCED_KEYS,                                  \
+      .gamepad_buttons = DEFAULT_GAMEPAD_BUTTONS,                              \
+      .gamepad_options = DEFAULT_GAMEPAD_OPTIONS,                              \
+      .tick_rate = DEFAULT_TICK_RATE,                                          \
+  }
 #endif
 
 //--------------------------------------------------------------------+
@@ -107,16 +196,6 @@ void eeconfig_init(void);
 bool eeconfig_reset(void);
 
 /**
- * @brief Set the tick rate
- *
- * @param profile Profile index
- * @param tick_rate New tick rate value
- *
- * @return true if successful, false otherwise
- */
-bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate);
-
-/**
  * @brief Set the calibration configuration
  *
  * @param calibration New calibration configuration
@@ -124,6 +203,15 @@ bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate);
  * @return true if successful, false otherwise
  */
 bool eeconfig_set_calibration(const void *calibration);
+
+/**
+ * @brief Set the options configuration
+ *
+ * @param options New options configuration
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_options(const void *options);
 
 /**
  * @brief Set the current profile
@@ -173,3 +261,36 @@ bool eeconfig_set_actuation_map(uint8_t profile, uint8_t start, uint8_t len,
  */
 bool eeconfig_set_advanced_keys(uint8_t profile, uint8_t start, uint8_t len,
                                 const void *advanced_keys);
+
+/**
+ * @brief Set the gamepad buttons for a profile
+ *
+ * @param profile Profile index
+ * @param start Starting button index
+ * @param len Length of the partial buttons
+ * @param buttons New partial gamepad buttons
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_gamepad_buttons(uint8_t profile, uint8_t start, uint8_t len,
+                                  const void *buttons);
+
+/**
+ * @brief Set the gamepad options for a profile
+ *
+ * @param profile Profile index
+ * @param options New gamepad options
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_gamepad_options(uint8_t profile, const void *options);
+
+/**
+ * @brief Set the tick rate
+ *
+ * @param profile Profile index
+ * @param tick_rate New tick rate value
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate);

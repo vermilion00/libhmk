@@ -87,6 +87,15 @@ void command_process(const uint8_t *buf) {
     *profile = eeconfig->current_profile;
     break;
   }
+  case COMMAND_GET_OPTIONS: {
+    uint16_t *options = (uint16_t *)(out_buffer + 1);
+    *options = eeconfig->options.raw;
+    break;
+  }
+  case COMMAND_SET_OPTIONS: {
+    success = eeconfig_set_options((const void *)command_data);
+    break;
+  }
   case COMMAND_GET_KEYMAP: {
     const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t), 0);
     const uint8_t profile = command_data[0];
@@ -220,6 +229,69 @@ void command_process(const uint8_t *buf) {
     }
 
     success = eeconfig_set_tick_rate(profile, tick_rate);
+    break;
+  }
+  case COMMAND_GET_GAMEPAD_BUTTONS: {
+    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t), 0);
+    const uint8_t profile = command_data[0];
+    const uint8_t start = command_data[1] * partial_size;
+
+    if (profile >= NUM_PROFILES || start >= NUM_KEYS) {
+      // Invalid parameters
+      success = false;
+      break;
+    }
+
+    uint8_t *gamepad_buttons = out_buffer + 1;
+    for (uint32_t i = 0; i < partial_size; i++) {
+      if (start + i >= NUM_KEYS)
+        break;
+      gamepad_buttons[i] =
+          eeconfig->profiles[profile].gamepad_buttons[start + i];
+    }
+    break;
+  }
+  case COMMAND_SET_GAMEPAD_BUTTONS: {
+    const uint8_t partial_size = COMMAND_PARTIAL_SIZE(sizeof(uint8_t), 3);
+    const uint8_t profile = command_data[0];
+    const uint8_t start = command_data[1];
+    const uint8_t len = command_data[2];
+
+    if (profile >= NUM_PROFILES || start + len > NUM_KEYS ||
+        len > partial_size) {
+      // Invalid parameters
+      success = false;
+      break;
+    }
+
+    success =
+        eeconfig_set_gamepad_buttons(profile, start, len, command_data + 3);
+    break;
+  }
+  case COMMAND_GET_GAMEPAD_OPTIONS: {
+    const uint8_t profile = command_data[0];
+
+    if (profile >= NUM_PROFILES) {
+      // Invalid parameters
+      success = false;
+      break;
+    }
+
+    gamepad_options_t *gamepad_options = (gamepad_options_t *)(out_buffer + 1);
+    memcpy(gamepad_options, &eeconfig->profiles[profile].gamepad_options,
+           sizeof(gamepad_options_t));
+    break;
+  }
+  case COMMAND_SET_GAMEPAD_OPTIONS: {
+    const uint8_t profile = command_data[0];
+
+    if (profile >= NUM_PROFILES) {
+      // Invalid parameters
+      success = false;
+      break;
+    }
+
+    success = eeconfig_set_gamepad_options(profile, command_data + 1);
     break;
   }
   default: {

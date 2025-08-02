@@ -29,6 +29,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // Load the configuration file before the rest of the headers
@@ -46,6 +47,7 @@
 #define M_DIV_CEIL(n, d) (((n) + (d) - 1) / (d))
 #define M_BIT(n) (1UL << (n))
 #define M_IS_POWER_OF_TWO(n) (((n) != 0) && (((n) & ((n) - 1)) == 0))
+#define M_HEX(n) ((n) < 10 ? '0' + (n) : 'A' - 10 + (n))
 
 //--------------------------------------------------------------------+
 // Keyboard Configuration
@@ -184,3 +186,61 @@ typedef struct __attribute__((packed)) {
     toggle_t toggle;
   };
 } advanced_key_t;
+
+// Gamepad buttons
+typedef enum {
+  GP_BUTTON_NONE = 0,
+
+  // Digital buttons
+  GP_BUTTON_A,
+  GP_BUTTON_B,
+  GP_BUTTON_X,
+  GP_BUTTON_Y,
+  GP_BUTTON_UP,
+  GP_BUTTON_DOWN,
+  GP_BUTTON_LEFT,
+  GP_BUTTON_RIGHT,
+  GP_BUTTON_START,
+  GP_BUTTON_BACK,
+  GP_BUTTON_HOME,
+  GP_BUTTON_LS,
+  GP_BUTTON_RS,
+  GP_BUTTON_LB,
+  GP_BUTTON_RB,
+
+  // Analog buttons
+  GP_BUTTON_LS_UP,
+  GP_BUTTON_LS_DOWN,
+  GP_BUTTON_LS_LEFT,
+  GP_BUTTON_LS_RIGHT,
+  GP_BUTTON_RS_UP,
+  GP_BUTTON_RS_DOWN,
+  GP_BUTTON_RS_LEFT,
+  GP_BUTTON_RS_RIGHT,
+  GP_BUTTON_LT,
+  GP_BUTTON_RT,
+} gamepad_button_t;
+
+// Gamepad options configuration
+typedef struct __attribute__((packed)) {
+  // 4 points that define the analog curve, representing the relationship
+  // between the key position and the gamepad analog value
+  uint8_t analog_curve[4][2];
+  union {
+    struct __attribute__((packed)) {
+      // Whether to enable the layout processing for this profile
+      bool keyboard_enabled : 1;
+      // Whether the layout module should process the underlying key if the key
+      // is mapped to a gamepad button
+      bool gamepad_override : 1;
+      // Whether the joystick output is square-shaped instead of circular
+      bool square_joystick : 1;
+      // Whether to use the maximum value of opposite axes for the joystick
+      // output instead of combining them
+      bool snappy_joystick : 1;
+      // Reserved bits for future use
+      uint8_t reserved : 4;
+    };
+    uint8_t options;
+  };
+} gamepad_options_t;

@@ -33,6 +33,7 @@ static const eeconfig_t default_eeconfig = {
     .magic_start = EECONFIG_MAGIC_START,
     .version = EECONFIG_VERSION,
     .calibration = DEFAULT_CALIBRATION,
+    .options = DEFAULT_OPTIONS,
     .current_profile = 0,
     .last_non_default_profile = M_MIN(1, NUM_PROFILES - 1),
     .profiles = {[0 ... NUM_PROFILES - 1] = DEFAULT_PROFILE},
@@ -59,15 +60,12 @@ bool eeconfig_reset(void) {
   return status;
 }
 
-bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate) {
-  if (profile >= NUM_PROFILES)
-    return false;
-
-  return EECONFIG_UPDATE(profiles[profile].tick_rate, &tick_rate);
-}
-
 bool eeconfig_set_calibration(const void *calibration) {
   return EECONFIG_UPDATE(calibration, calibration);
+}
+
+bool eeconfig_set_options(const void *options) {
+  return EECONFIG_UPDATE(options, options);
 }
 
 bool eeconfig_set_current_profile(uint8_t profile) {
@@ -117,4 +115,27 @@ bool eeconfig_set_advanced_keys(uint8_t profile, uint8_t start, uint8_t len,
     layout_load_advanced_keys();
 
   return status;
+}
+
+bool eeconfig_set_gamepad_buttons(uint8_t profile, uint8_t start, uint8_t len,
+                                  const void *buttons) {
+  if (profile >= NUM_PROFILES || start + len > NUM_KEYS)
+    return false;
+
+  return EECONFIG_UPDATE_N(profiles[profile].gamepad_buttons[start], buttons,
+                           len);
+}
+
+bool eeconfig_set_gamepad_options(uint8_t profile, const void *options) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  return EECONFIG_UPDATE(profiles[profile].gamepad_options, options);
+}
+
+bool eeconfig_set_tick_rate(uint8_t profile, uint8_t tick_rate) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  return EECONFIG_UPDATE(profiles[profile].tick_rate, &tick_rate);
 }

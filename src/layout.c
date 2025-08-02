@@ -23,6 +23,7 @@
 #include "hid.h"
 #include "keycodes.h"
 #include "matrix.h"
+#include "xinput.h"
 
 // Layer mask. Each bit represents whether a layer is active or not.
 static uint16_t layer_mask;
@@ -137,6 +138,24 @@ void layout_task(void) {
   for (uint32_t i = 0; i < NUM_KEYS; i++) {
     const key_state_t *k = &key_matrix[i];
     const bool last_key_press = bitmap_get(key_press_states, i);
+
+    if ((current_layer == 0) & eeconfig->options.xinput_enabled) {
+      // XInput key only applies to layer 0. We process it first since the
+      // subsequent key processing may be skipped due to the gamepad options.
+      if (CURRENT_PROFILE.gamepad_buttons[i] != GP_BUTTON_NONE) {
+        xinput_process(i);
+
+        if (CURRENT_PROFILE.gamepad_options.gamepad_override)
+          // If the key is mapped to a gamepad button, and the gamepad override
+          // is enabled, we skip the key processing.
+          continue;
+      }
+
+      if (!CURRENT_PROFILE.gamepad_options.keyboard_enabled)
+        // If the keyboard is disabled for this profile, we skip the key
+        // processing.
+        continue;
+    }
 
     if ((current_layer == 0) & bitmap_get(key_disabled, i))
       // Only keys in layer 0 can be disabled.
