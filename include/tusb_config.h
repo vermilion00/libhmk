@@ -17,8 +17,9 @@
 
 #include "common.h"
 
-// STM32F446xx
-#define CFG_TUSB_MCU OPT_MCU_STM32F4
+#if !defined(CFG_TUSB_MCU)
+#error "CFG_TUSB_MCU is not defined"
+#endif
 
 // Default TinyUSB configuration
 #define CFG_TUSB_OS OPT_OS_NONE
