@@ -71,7 +71,7 @@ static void board_clock_init(void) {
   system_core_clock_update();
 }
 
-#if !defined(BOARD_USB_HS)
+#if defined(BOARD_USB_FS)
 /**
  * @brief Reduce power consumption of USB HS PHY when not initialized (FAQ0148)
  *
@@ -117,11 +117,9 @@ static void board_reduce_power_consumption(void) {
  * @return None
  */
 static void board_usb_init(void) {
-#if !defined(BOARD_USB_HS)
-  board_reduce_power_consumption();
-#endif
-
 #if defined(BOARD_USB_FS)
+  board_reduce_power_consumption();
+
   // Configure USB FS clock
   crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
   crm_periph_clock_enable(CRM_OTGFS1_PERIPH_CLOCK, TRUE);
@@ -144,9 +142,13 @@ static void board_usb_init(void) {
   crm_usb_clock_source_select(CRM_USB_CLOCK_SOURCE_PLLU);
 
 #if defined(BOARD_USB_FS)
+  // Ignore USB FS VBUS sensing
+  OTG1_GLOBAL->gccfg_bit.vbusig = TRUE;
   // Set NVIC priority for USB FS interrupt
   NVIC_SetPriority(OTGFS1_IRQn, 0);
 #elif defined(BOARD_USB_HS)
+  // Ignore USB HS VBUS sensing
+  OTG2_GLOBAL->gccfg_bit.vbusig = TRUE;
   // Set NVIC priority for USB HS interrupt
   NVIC_SetPriority(OTGHS_IRQn, 0);
 #else
