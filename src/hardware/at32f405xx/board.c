@@ -226,8 +226,10 @@ uint32_t board_serial(uint16_t *buf) {
 
   const uint32_t *uid = (const uint32_t *)(0x1FFFF7E8);
   // Use the 96-bit unique ID as the serial number
-  sprintf(serial_str, "%08" PRIX32 "%08" PRIX32 "%08" PRIX32, uid[2], uid[1],
-          uid[0]);
+  for (uint32_t i = 0; i < 12; i++) {
+    serial_str[i * 2] = M_HEX(uid[i] >> 4);
+    serial_str[i * 2 + 1] = M_HEX(uid[i] & 0x0F);
+  }
 
   // Convert ASCII string into UTF-16-LE
   for (size_t i = 0; i < 24; i++)
