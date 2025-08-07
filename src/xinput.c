@@ -184,8 +184,8 @@ void xinput_task(void) {
     uint16_t *state = &joystick_states[i * 2];
 
     if (!CURRENT_PROFILE.gamepad_options.square_joystick) {
-      uint32_t x = square_to_circular(state[0], state[1]);
-      uint32_t y = square_to_circular(state[1], state[0]);
+      const uint32_t x = square_to_circular(state[0], state[1]);
+      const uint32_t y = square_to_circular(state[1], state[0]);
       state[0] = x, state[1] = y;
 
       const uint32_t magnitude = usqrt16(x * x + y * y);
@@ -234,7 +234,8 @@ void xinput_task(void) {
       } else {
         // Otherwise, scale the joystick states to the new magnitude
         // We scale the maximum vector instead of the joystick vector to
-        // prevent the analog values from exceeding the maximum range.
+        // prevent the analog values from exceeding the maximum range due to
+        // approximation errors.
         state[0] = max_x * new_magnitude / 255;
         state[1] = max_y * new_magnitude / 255;
       }
