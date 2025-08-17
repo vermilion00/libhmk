@@ -173,11 +173,17 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_GET_TICK_RATE: {
-    out->tick_rate = eeconfig->profiles[eeconfig->current_profile].tick_rate;
+    const command_in_tick_rate_t *p = &in->tick_rate;
+
+    COMMAND_VERIFY(p->profile < NUM_PROFILES);
+
+    out->tick_rate = eeconfig->profiles[p->profile].tick_rate;
     break;
   }
   case COMMAND_SET_TICK_RATE: {
     const command_in_tick_rate_t *p = &in->tick_rate;
+
+    COMMAND_VERIFY(p->profile < NUM_PROFILES);
 
     success = EECONFIG_WRITE(profiles[p->profile].tick_rate, &p->tick_rate);
     break;
@@ -208,8 +214,11 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_GET_GAMEPAD_OPTIONS: {
-    out->gamepad_options =
-        eeconfig->profiles[eeconfig->current_profile].gamepad_options;
+    const command_in_gamepad_options_t *p = &in->gamepad_options;
+
+    COMMAND_VERIFY(p->profile < NUM_PROFILES);
+
+    out->gamepad_options = eeconfig->profiles[p->profile].gamepad_options;
     break;
   }
   case COMMAND_SET_GAMEPAD_OPTIONS: {
