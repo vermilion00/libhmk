@@ -196,6 +196,15 @@ void eeconfig_init(void);
 bool eeconfig_reset(void);
 
 /**
+ * @brief Reset a specific profile to default values
+ *
+ * @param profile Profile index
+ *
+ * @return true if successful, false otherwise
+ */
+bool eeconfig_reset_profile(uint8_t profile);
+
+/**
  * @brief Write a value to a field in the persistent configuration
  *
  * @param field Field to write to

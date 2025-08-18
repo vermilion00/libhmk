@@ -46,9 +46,24 @@ void eeconfig_init(void) {
 }
 
 bool eeconfig_reset(void) {
+  advanced_key_clear();
   const bool status =
       wear_leveling_write(0, &default_eeconfig, sizeof(default_eeconfig));
   layout_load_advanced_keys();
+
+  return status;
+}
+
+bool eeconfig_reset_profile(uint8_t profile) {
+  if (profile >= NUM_PROFILES)
+    return false;
+
+  if (eeconfig->current_profile == profile)
+    advanced_key_clear();
+  const bool status =
+      EECONFIG_WRITE(profiles[profile], &default_eeconfig.profiles[profile]);
+  if (eeconfig->current_profile == profile)
+    layout_load_advanced_keys();
 
   return status;
 }

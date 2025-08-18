@@ -91,6 +91,28 @@ void command_process(const uint8_t *buf) {
     success = EECONFIG_WRITE(options, &in->options);
     break;
   }
+  case COMMAND_RESET_PROFILE: {
+    const command_in_reset_profile_t *p = &in->reset_profile;
+
+    COMMAND_VERIFY(p->profile < NUM_PROFILES);
+
+    success = eeconfig_reset_profile(p->profile);
+    break;
+  }
+  case COMMAND_DUPLICATE_PROFILE: {
+    const command_in_duplicate_profile_t *p = &in->duplicate_profile;
+
+    COMMAND_VERIFY(p->profile < NUM_PROFILES);
+    COMMAND_VERIFY(p->src_profile < NUM_PROFILES);
+
+    if (p->profile == eeconfig->current_profile)
+      advanced_key_clear();
+    success = EECONFIG_WRITE(profiles[p->profile],
+                             &eeconfig->profiles[p->src_profile]);
+    if (p->profile == eeconfig->current_profile)
+      layout_load_advanced_keys();
+    break;
+  }
   case COMMAND_GET_KEYMAP: {
     const command_in_keymap_t *p = &in->keymap;
 
