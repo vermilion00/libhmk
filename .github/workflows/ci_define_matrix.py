@@ -1,5 +1,3 @@
-import argparse
-import configparser
 import os
 import json
 
@@ -10,18 +8,17 @@ platforms = {
 if __name__ == "__main__":
     matrix = []
     for keyboard in os.listdir("keyboards"):
-        pio_ini_path = os.path.join("keyboards", keyboard, "pio.ini")
+        config_json_path = os.path.join("keyboards", keyboard, "config.json")
 
-        if not os.path.exists(pio_ini_path):
+        if not os.path.exists(config_json_path):
             continue
 
-        config = configparser.ConfigParser()
-        config.read(pio_ini_path)
+        with open(config_json_path, "r") as f:
+            config = json.load(f)
 
         packages = []
-        for section in config.values():
-            if "platform" in section and section["platform"] in platforms:
-                packages.append(platforms[section["platform"]])
+        if "platform" in config and config["platform"] in platforms:
+            packages.append(platforms[config["platform"]])
 
         matrix.append({"keyboard": keyboard, "packages": " ".join(packages)})
 

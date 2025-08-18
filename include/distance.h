@@ -24,7 +24,7 @@
 // Distance lookup table size
 #define DISTANCE_LUT_SIZE 1024
 
-// Distance lookup table obtained from running `distance_lut.py`
+// Distance lookup table obtained from running `tools/distance_lut.py`
 // The table represents 255 * log(1 + ax) / log(1 + (LUT_SIZE - 1)x), where x is
 // the ADC values normalized to the range [0, LUT_SIZE - 1] and a is a constant
 // obtained through fitting the curve to the samples from GEON Raw HE switches

@@ -5,6 +5,7 @@ on:
   pull_request:
     branches: [main, dev]
     paths:
+      - "setup.py"
       - "hardware/**"
       - "include/**"
       - "keyboards/**"
@@ -15,6 +16,7 @@ on:
   push:
     branches: [main, dev]
     paths:
+      - "setup.py"
       - "hardware/**"
       - "include/**"
       - "keyboards/**"
@@ -78,7 +80,9 @@ jobs:
           done
 
       - name: Build ${{ matrix.keyboard }}
-        run: pio run -c keyboards/${{ matrix.keyboard }}/pio.ini
+        run: |
+          python setup.py -k ${{ matrix.keyboard }}
+          pio run
 
       - name: Archive Firmware Artifact
         uses: actions/upload-artifact@v4

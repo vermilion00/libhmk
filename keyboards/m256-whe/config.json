@@ -1,0 +1,7 @@
+{
+  "driver": "stm32f446xx",
+  "ldscript": "stm32f446retx.ld",
+  "board": "genericSTM32F446RE",
+  "framework": "stm32cube",
+  "platform": "ststm32"
+}

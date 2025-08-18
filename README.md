@@ -37,7 +37,7 @@ This repository contains libraries for building a Hall-effect keyboard firmware.
 ### Prerequisites
 
 - [PlatformIO](https://platformio.org/)
-- [Python 3](https://www.python.org/) (Optional, for generating the distance lookup table)
+- [Python 3](https://www.python.org/)
 
 ### Building the Firmware
 
@@ -49,7 +49,7 @@ This repository contains libraries for building a Hall-effect keyboard firmware.
 
 2. Open the project in PlatformIO, such as through Visual Studio Code.
 
-3. Copy `keyboards/<YOUR_KEYBOARD>/pio.ini` to the root directory of the project and rename it to `platformio.ini`.
+3. Run `python setup.py -k <YOUR_KEYBOARD>` to generate the `platformio.ini` file.
 
 4. Wait for PlatformIO to finish initializing the environment.
 
@@ -69,25 +69,18 @@ The development branch is `dev`, which contains the latest features and bug fixe
 To develop a new keyboard, create a new directory under `keyboards/` with your keyboard's name. This directory should include the following files:
 
 - `config.h`: Configuration header for your keyboard
-- `pio.ini`: PlatformIO configuration file for your keyboard
+- `config.json`: A JSON file describing your keyboard's setup to be used by the `setup.py`. The file must contains the following keys:
+  - `driver`: The name of the keyboard driver, which is one of the drivers in the `hardware/` directory
+  - `board`: The name of the PlatformIO [board](https://docs.platformio.org/en/latest/boards/index.html).
+  - `ldscript`: The name of the linker script, which is one of the linker scripts in the `linker/` directory.
+  - `framework`: The name of the the PlatformIO [framework](https://docs.platformio.org/en/latest/frameworks/index.html).
+  - `platform`: The name of the PlatformIO [platform](https://docs.platformio.org/en/latest/platforms/index.html).
 
 You can use an existing keyboard implementation as a reference. If your keyboard hardware isn't currently supported by the firmware, you'll need to implement the necessary drivers and features. See the [Porting](#porting) section for more details.
 
 ### Debugging
 
-In addition to the debugging options provided by PlatformIO, you can use the `log_printf` function to log messages to the console. This function is available when:
-
-- The `LOG_ENABLED` macro is defined in the keyboard's `config.h` file, or in `platformio.ini` under the `build_flags` section.
-- The `printf` library is included in `platformio.ini` under the `lib_deps` section as follows:
-
-  ```patch
-  ...
-  - lib_deps = https://github.com/hathach/tinyusb.git
-  + lib_deps =
-  +   https://github.com/hathach/tinyusb.git
-  +   https://github.com/eyalroz/printf.git#develop
-  ...
-  ```
+In addition to the debugging options provided by PlatformIO, you can use the `log_printf` function to log messages to the console. The function is available when you run the `setup.py` with the flag `--log` to enable logging. The function uses [`eyalroz/printf`](https://github.com/eyalroz/printf) as a backend for text formatting.
 
 The log messages will be sent to the HID interface, which can be viewed in [hid_listen](https://www.pjrc.com/teensy/hid_listen.html), [QMK CLI](https://docs.qmk.fm/cli_commands#qmk-console), or [QMK Toolbox](https://qmk.fm/toolbox) (buggy, not recommended).
 
@@ -112,3 +105,4 @@ You can refer to existing hardware drivers as examples when implementing support
 - [@heiso](https://github.com/heiso/) for his [macrolev](https://github.com/heiso/macrolev) and his helpfulness throughout the development process.
 - [Wooting](https://wooting.io/) for pioneering Hall-effect gaming keyboards and introducing many advanced features based on analog input.
 - [GEONWORKS](https://geon.works/) for the Venom 60HE PCB and inspiring the web configurator.
+- [@eyalroz](https://github.com/eyalroz) for his work on the printf library and its integration into the firmware.
