@@ -112,7 +112,7 @@ void analog_init(void) {
   // Initialize the ADC peripheral
   adc_handle.Instance = ADC1;
   adc_handle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  adc_handle.Init.Resolution = ADC_RESOLUTION;
+  adc_handle.Init.Resolution = ADC_RESOLUTION_12B;
   adc_handle.Init.ScanConvMode = ENABLE;
   adc_handle.Init.ContinuousConvMode = DISABLE;
   adc_handle.Init.DiscontinuousConvMode = DISABLE;

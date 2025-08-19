@@ -129,8 +129,8 @@ adc_to_distance(uint16_t adc, uint16_t adc_rest_value,
 
   // Normalize ADC value to the range [0, LUT_SIZE - 1]
   const uint32_t normalized = (uint32_t)(adc - adc_rest_value) *
-                              (DISTANCE_LUT_SIZE - 1) /
-                              (adc_bottom_out_value - adc_rest_value);
+                              (uint32_t)(DISTANCE_LUT_SIZE - 1) /
+                              (uint32_t)(adc_bottom_out_value - adc_rest_value);
 
   return distance_lut[normalized];
 }

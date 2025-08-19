@@ -3,48 +3,17 @@ import configparser
 import json
 import os
 
-BUILD_FLAGS = """
--Wall
--Wextra
--Wno-unused-parameter"""
 
-BUILD_SRC_FILTER = """
-+<*>
--<.git/>
--<.svn/>
--<hardware/>"""
-
-LIB_DEPS = """
-https://github.com/hathach/tinyusb.git"""
-
-UPLOAD_PROTOCOL = "dfu"
-
-BOARD_BUILD_LINKER_SCRIPT = "linker/{ldscript}"
-
-ENV_BUILD_FLAGS = """
-${{env.build_flags}}
--Ihardware/{driver}/
--Ikeyboards/{keyboard}/
--Iinclude/"""
-
-ENV_BUILD_SRC_FILTER = """
-${{env.build_src_filter}}
-+<hardware/{driver}/>"""
-
-
-def validate_config_json(config_json):
-    drivers = os.listdir("hardware")
-    ldscripts = os.listdir("linker")
-
+def validate_config(config):
     required_keys = ["driver", "board", "ldscript", "framework", "platform"]
     for key in required_keys:
-        if key not in config_json:
+        if key not in config:
             raise ValueError(f"Missing required key: {key}")
 
-    if config_json["driver"] not in drivers:
-        raise ValueError(f"Invalid driver: {config_json['driver']}")
-    if config_json["ldscript"] not in ldscripts:
-        raise ValueError(f"Invalid ldscript: {config_json['ldscript']}")
+    if config["driver"] not in os.listdir("hardware"):
+        raise ValueError(f"Invalid driver: {config['driver']}")
+    if config["ldscript"] not in os.listdir("linker"):
+        raise ValueError(f"Invalid ldscript: {config['ldscript']}")
 
 
 if __name__ == "__main__":
@@ -59,43 +28,57 @@ if __name__ == "__main__":
 
     keyboard: str = args.keyboard
 
-    config_json_path = os.path.join("keyboards", keyboard, "config.json")
-
-    if not os.path.exists(config_json_path):
+    config_path = os.path.join("keyboards", keyboard, "config.json")
+    if not os.path.exists(config_path):
         raise FileNotFoundError(f"config.json not found for {keyboard}")
-    with open(config_json_path, "r") as f:
-        config_json = json.load(f)
+    with open(config_path, "r") as f:
+        config = json.load(f)
 
-    validate_config_json(config_json)
+    validate_config(config)
 
-    # Global settings
-    config = configparser.ConfigParser()
-    config["env"] = {
-        "build_flags": BUILD_FLAGS,
-        "build_src_filter": BUILD_SRC_FILTER,
-        "lib_deps": LIB_DEPS,
-        "upload_protocol": UPLOAD_PROTOCOL,
-    }
-
-    # Environment-specific settings
-    config[f"env:{keyboard}"] = {
-        "board": config_json["board"],
-        "board_build.ldscript": BOARD_BUILD_LINKER_SCRIPT.format(
-            ldscript=config_json["ldscript"]
-        ),
-        "build_flags": ENV_BUILD_FLAGS.format(
-            driver=config_json["driver"], keyboard=keyboard
-        ),
-        "build_src_filter": ENV_BUILD_SRC_FILTER.format(driver=config_json["driver"]),
-        "framework": config_json["framework"],
-        "platform": config_json["platform"],
-    }
+    lib_deps = ["https://github.com/hathach/tinyusb.git"]
+    build_flags = [
+        "${env.build_flags}",
+        # We prioritize including driver and keyboard headers.
+        f"-Ihardware/{config['driver']}/",
+        f"-Ikeyboards/{keyboard}/",
+        "-Iinclude/",
+    ]
+    build_src_filter = [
+        "${env.build_src_filter}",
+        "-<hardware/>",
+        f"+<hardware/{config['driver']}/>",
+    ]
+    build_src_flags = [
+        "${env.build_src_flags}",
+        "-Werror",
+        "-Wall",
+        "-Wextra",
+        "-Wsign-conversion",
+        "-Wswitch-default",
+        "-Wswitch",
+        "-Wdouble-promotion",
+        "-Wstrict-prototypes",
+        "-Wno-unused-parameter",
+    ]
 
     if args.log:
-        # Add print library
-        config["env"]["lib_deps"] += "\nhttps://github.com/eyalroz/printf.git#develop"
         # Enable logging module
-        config[f"env:{keyboard}"]["build_flags"] += "\n-DLOG_ENABLED"
+        lib_deps.append("https://github.com/eyalroz/printf.git#develop")
+        build_src_flags.append("-DLOG_ENABLED")
+
+    pio_config = configparser.ConfigParser()
+    pio_config[f"env:{keyboard}"] = {
+        "board": config["board"],
+        "board_build.ldscript": f"linker/{config['ldscript']}",
+        "build_flags": "\n".join(build_flags),
+        "build_src_filter": "\n".join(build_src_filter),
+        "build_src_flags": "\n".join(build_src_flags),
+        "framework": config["framework"],
+        "lib_deps": "\n".join(lib_deps),
+        "platform": config["platform"],
+        "upload_protocol": "dfu",
+    }
 
     with open("platformio.ini", "w") as f:
-        config.write(f)
+        pio_config.write(f)

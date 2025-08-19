@@ -79,7 +79,7 @@ __attribute__((always_inline)) static inline void layout_layer_lock(void) {
  */
 static uint8_t layout_get_keycode(uint8_t current_layer, uint8_t key) {
   // Find the first active layer with a non-transparent keycode
-  for (uint32_t i = current_layer + 1; i-- > 0;) {
+  for (uint32_t i = (uint32_t)current_layer + 1; i-- > 0;) {
     if (((layer_mask >> i) & 1) == 0)
       // Layer is not active
       continue;

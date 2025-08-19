@@ -28,7 +28,7 @@ uint32_t crc32_compute(const void *buf, uint32_t len, uint32_t crc) {
   crc_one_word_calculate(crc);
   crc = crc_block_calculate((uint32_t *)buf8, len >> 2);
   if (len & 3) {
-    memcpy(&k, buf8 + (len & ~3), len & 3);
+    memcpy(&k, buf8 + (len & ~(uint32_t)3), len & 3);
     crc = crc_one_word_calculate(k);
   }
 

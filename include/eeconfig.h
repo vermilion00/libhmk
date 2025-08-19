@@ -110,23 +110,20 @@ extern const eeconfig_t *eeconfig;
 #endif
 
 #if !defined(DEFAULT_OPTIONS)
-#define DEFAULT_OPTIONS {0}
+// Default global options
+#define DEFAULT_OPTIONS {.xinput_enabled = false}
 #endif
 
 #if !defined(DEFAULT_KEYMAP)
 // Default keymap
-#define DEFAULT_KEYMAP {0}
+#define DEFAULT_KEYMAP                                                         \
+  {                                                                            \
+  }
 #endif
 
-#if !defined(DEFAULT_ACTUATION)
-// Default actuation
-#define DEFAULT_ACTUATION                                                      \
-  {                                                                            \
-      .actuation_point = 128,                                                  \
-      .rt_down = 0,                                                            \
-      .rt_up = 0,                                                              \
-      .continuous = false,                                                     \
-  }
+#if !defined(DEFAULT_ACTUATION_POINT)
+// Default actuation point
+#define DEFAULT_ACTUATION_POINT 128
 #endif
 
 #if !defined(DEFAULT_GAMEPAD_OPTIONS)

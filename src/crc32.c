@@ -22,7 +22,7 @@ __attribute__((always_inline)) static inline uint32_t crc32_update(uint32_t crc,
                                                                    uint32_t k) {
   crc ^= k;
   for (uint32_t i = 0; i < 32; i++)
-    crc = (crc >> 1) ^ (CRC32_POLY & -(int32_t)(crc & 1));
+    crc = (crc >> 1) ^ (CRC32_POLY & (uint32_t)(-(int32_t)(crc & 1)));
 
   return crc;
 }

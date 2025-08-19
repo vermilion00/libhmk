@@ -22,11 +22,11 @@
 
 const eeconfig_t *eeconfig;
 
+// Default configuration values
+static eeconfig_options_t default_options = DEFAULT_OPTIONS;
+static eeconfig_calibration_t default_calibration = DEFAULT_CALIBRATION;
 static eeconfig_profile_t default_profile = {
     .keymap = DEFAULT_KEYMAP,
-    // `actuation_map` is filled in the initialization function.
-    // `advanced_keys` is empty by default.
-    // `gamepad_buttons` is empty by default.
     .gamepad_options = DEFAULT_GAMEPAD_OPTIONS,
     .tick_rate = DEFAULT_TICK_RATE,
 };
@@ -38,9 +38,9 @@ static bool eeconfig_is_latest_version(void) {
 }
 
 void eeconfig_init(void) {
-  // Fill default profile with default actuation.
+  // Update default profile with its default values
   for (uint32_t i = 0; i < NUM_KEYS; i++)
-    default_profile.actuation_map[i] = (actuation_t)DEFAULT_ACTUATION;
+    default_profile.actuation_map[i].actuation_point = DEFAULT_ACTUATION_POINT;
 
   eeconfig = (const eeconfig_t *)wl_cache;
   if (!eeconfig_is_latest_version() && !migration_try_migrate())
@@ -48,7 +48,7 @@ void eeconfig_init(void) {
 }
 
 // Helper macro for writing rvalue
-#define EECONFIG_WRITE_RVAL(field, value)                                      \
+#define EECONFIG_WRITE_LOCAL(field, value)                                     \
   do {                                                                         \
     typeof(((eeconfig_t *)0)->field) _value = value;                           \
     status &= EECONFIG_WRITE(field, &_value);                                  \
@@ -57,19 +57,21 @@ void eeconfig_init(void) {
 bool eeconfig_reset(void) {
   bool status = true;
   advanced_key_clear();
-  EECONFIG_WRITE_RVAL(magic_start, EECONFIG_MAGIC_START);
-  EECONFIG_WRITE_RVAL(version, EECONFIG_VERSION);
-  EECONFIG_WRITE_RVAL(calibration, DEFAULT_CALIBRATION);
-  EECONFIG_WRITE_RVAL(options, DEFAULT_OPTIONS);
-  EECONFIG_WRITE_RVAL(current_profile, 0);
-  EECONFIG_WRITE_RVAL(last_non_default_profile, M_MIN(1, NUM_PROFILES - 1));
+  EECONFIG_WRITE_LOCAL(magic_start, EECONFIG_MAGIC_START);
+  EECONFIG_WRITE_LOCAL(version, EECONFIG_VERSION);
+  status &= EECONFIG_WRITE(calibration, &default_calibration);
+  status &= EECONFIG_WRITE(options, &default_options);
+  EECONFIG_WRITE_LOCAL(current_profile, 0);
+  EECONFIG_WRITE_LOCAL(last_non_default_profile, M_MIN(1, NUM_PROFILES - 1));
   for (uint32_t i = 0; i < NUM_PROFILES; i++)
     status &= EECONFIG_WRITE(profiles[i], &default_profile);
-  EECONFIG_WRITE_RVAL(magic_end, EECONFIG_MAGIC_END);
+  EECONFIG_WRITE_LOCAL(magic_end, EECONFIG_MAGIC_END);
   layout_load_advanced_keys();
 
   return status;
 }
+
+#undef EECONFIG_WRITE_LOCAL
 
 bool eeconfig_reset_profile(uint8_t profile) {
   if (profile >= NUM_PROFILES)

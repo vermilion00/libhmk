@@ -35,7 +35,7 @@ uint32_t crc32_compute(const void *buf, uint32_t len, uint32_t crc) {
   HAL_CRC_Calculate(&crc_handle, &crc, 1);
   crc = HAL_CRC_Accumulate(&crc_handle, (void *)buf8, len >> 2);
   if (len & 3) {
-    memcpy(&k, buf8 + (len & ~3), len & 3);
+    memcpy(&k, buf8 + (len & ~(uint32_t)3), len & 3);
     crc = HAL_CRC_Accumulate(&crc_handle, &k, 1);
   }
 

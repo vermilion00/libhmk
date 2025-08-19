@@ -45,7 +45,7 @@
 // ADC resolution in bits
 #define ADC_RESOLUTION 12
 // Maximum ADC value
-#define ADC_MAX_VALUE 4095
+#define ADC_MAX_VALUE ((1 << ADC_RESOLUTION) - 1)
 
 #if !defined(ADC_NUM_SAMPLE_CYCLES)
 // Number of sample cycles for each ADC conversion
