@@ -110,43 +110,23 @@ extern const eeconfig_t *eeconfig;
 #endif
 
 #if !defined(DEFAULT_OPTIONS)
-#define DEFAULT_OPTIONS                                                        \
-  {                                                                            \
-  }
+#define DEFAULT_OPTIONS {0}
 #endif
 
 #if !defined(DEFAULT_KEYMAP)
 // Default keymap
-#define DEFAULT_KEYMAP                                                         \
-  {                                                                            \
-    [0 ... NUM_LAYERS - 1] = { [0 ... NUM_KEYS - 1] = KC_NO }                  \
-  }
+#define DEFAULT_KEYMAP {0}
 #endif
 
-#if !defined(DEFAULT_ACTUATION_MAP)
-// Default actuation map
-#define DEFAULT_ACTUATION_MAP                                                  \
+#if !defined(DEFAULT_ACTUATION)
+// Default actuation
+#define DEFAULT_ACTUATION                                                      \
   {                                                                            \
-      [0 ... NUM_KEYS - 1] =                                                   \
-          {                                                                    \
-              .actuation_point = 128,                                          \
-              .rt_down = 0,                                                    \
-              .rt_up = 0,                                                      \
-              .continuous = false,                                             \
-          },                                                                   \
+      .actuation_point = 128,                                                  \
+      .rt_down = 0,                                                            \
+      .rt_up = 0,                                                              \
+      .continuous = false,                                                     \
   }
-#endif
-
-#if !defined(DEFAULT_ADVANCED_KEYS)
-// Default advanced keys
-#define DEFAULT_ADVANCED_KEYS                                                  \
-  {                                                                            \
-  }
-#endif
-
-#if !defined(DEFAULT_GAMEPAD_BUTTONS)
-// Default gamepad buttons
-#define DEFAULT_GAMEPAD_BUTTONS {[0 ... NUM_KEYS - 1] = GP_BUTTON_NONE}
 #endif
 
 #if !defined(DEFAULT_GAMEPAD_OPTIONS)
@@ -162,19 +142,6 @@ extern const eeconfig_t *eeconfig;
 #if !defined(DEFAULT_TICK_RATE)
 // Default tick rate
 #define DEFAULT_TICK_RATE 30
-#endif
-
-#if !defined(DEFAULT_PROFILE)
-// Default profile
-#define DEFAULT_PROFILE                                                        \
-  {                                                                            \
-      .keymap = DEFAULT_KEYMAP,                                                \
-      .actuation_map = DEFAULT_ACTUATION_MAP,                                  \
-      .advanced_keys = DEFAULT_ADVANCED_KEYS,                                  \
-      .gamepad_buttons = DEFAULT_GAMEPAD_BUTTONS,                              \
-      .gamepad_options = DEFAULT_GAMEPAD_OPTIONS,                              \
-      .tick_rate = DEFAULT_TICK_RATE,                                          \
-  }
 #endif
 
 //--------------------------------------------------------------------+
