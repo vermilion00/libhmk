@@ -37,6 +37,7 @@ typedef enum {
   COMMAND_SET_OPTIONS,
   COMMAND_RESET_PROFILE,
   COMMAND_DUPLICATE_PROFILE,
+  COMMAND_GET_METADATA,
 
   COMMAND_GET_KEYMAP = 128,
   COMMAND_SET_KEYMAP,
@@ -74,6 +75,10 @@ typedef struct __attribute__((packed)) {
   uint8_t profile;
   uint8_t src_profile;
 } command_in_duplicate_profile_t;
+
+typedef struct __attribute__((packed)) {
+  uint32_t offset;
+} command_in_metadata_t;
 
 typedef struct __attribute__((packed)) {
   uint8_t profile;
@@ -123,6 +128,7 @@ typedef struct __attribute__((packed)) {
     command_in_options_t options;
     command_in_reset_profile_t reset_profile;
     command_in_duplicate_profile_t duplicate_profile;
+    command_in_metadata_t metadata;
 
     command_in_keymap_t keymap;
     command_in_actuation_map_t actuation_map;
@@ -145,6 +151,11 @@ typedef struct __attribute__((packed)) {
   uint8_t distance;
 } command_out_analog_info_t;
 
+typedef struct __attribute__((packed)) {
+  uint32_t len;
+  uint8_t metadata[59];
+} command_out_metadata_t;
+
 // Command output buffer type
 typedef struct __attribute__((packed)) {
   uint8_t command_id;
@@ -159,6 +170,8 @@ typedef struct __attribute__((packed)) {
     uint8_t current_profile;
     // For `COMMAND_GET_OPTIONS`
     eeconfig_options_t options;
+    // For `COMMAND_GET_METADATA`
+    command_out_metadata_t metadata;
 
     // For `COMMAND_GET_KEYMAP`
     uint8_t keymap[63];

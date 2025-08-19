@@ -75,6 +75,7 @@ To develop a new keyboard, create a new directory under `keyboards/` with your k
   - `ldscript`: The name of the linker script, which is one of the linker scripts in the `linker/` directory.
   - `framework`: The name of the the PlatformIO [framework](https://docs.platformio.org/en/latest/frameworks/index.html).
   - `platform`: The name of the PlatformIO [platform](https://docs.platformio.org/en/latest/platforms/index.html).
+- `metadata.json`: A JSON file containing metadata about your keyboard, for use by the web configurator.
 
 You can use an existing keyboard implementation as a reference. If your keyboard hardware isn't currently supported by the firmware, you'll need to implement the necessary drivers and features. See the [Porting](#porting) section for more details.
 

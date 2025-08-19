@@ -19,6 +19,7 @@
 #include "hardware/hardware.h"
 #include "layout.h"
 #include "matrix.h"
+#include "metadata.h"
 #include "tusb.h"
 
 // Helper macro to verify command parameters
@@ -124,6 +125,16 @@ void command_process(const uint8_t *buf) {
            eeconfig->profiles[p->profile].keymap[p->layer] + p->offset,
            M_MIN(M_ARRAY_SIZE(out->keymap), (uint32_t)(NUM_KEYS - p->offset)) *
                sizeof(uint8_t));
+    break;
+  }
+  case COMMAND_GET_METADATA: {
+    const command_in_metadata_t *p = &in->metadata;
+
+    COMMAND_VERIFY(p->offset < sizeof(metadata_compressed));
+
+    out->metadata.len = sizeof(metadata_compressed) - p->offset;
+    memcpy(out->metadata.metadata, &metadata_compressed[p->offset],
+           M_MIN(sizeof(out->metadata.metadata), out->metadata.len));
     break;
   }
   case COMMAND_SET_KEYMAP: {

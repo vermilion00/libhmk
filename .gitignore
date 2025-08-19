@@ -1,3 +1,6 @@
 .pio
 .vscode/
 platformio.ini
+
+# Metadata header file
+include/metadata.h

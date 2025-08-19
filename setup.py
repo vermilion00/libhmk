@@ -36,7 +36,6 @@ if __name__ == "__main__":
 
     validate_config(config)
 
-    lib_deps = ["https://github.com/hathach/tinyusb.git"]
     build_flags = [
         "${env.build_flags}",
         # We prioritize including driver and keyboard headers.
@@ -61,6 +60,8 @@ if __name__ == "__main__":
         "-Wstrict-prototypes",
         "-Wno-unused-parameter",
     ]
+    extra_scripts = ["pre:tools/metadata.py"]
+    lib_deps = ["https://github.com/hathach/tinyusb.git"]
 
     if args.log:
         # Enable logging module
@@ -74,6 +75,7 @@ if __name__ == "__main__":
         "build_flags": "\n".join(build_flags),
         "build_src_filter": "\n".join(build_src_filter),
         "build_src_flags": "\n".join(build_src_flags),
+        "extra_scripts": "\n".join(extra_scripts),
         "framework": config["framework"],
         "lib_deps": "\n".join(lib_deps),
         "platform": config["platform"],
