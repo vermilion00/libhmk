@@ -8,4 +8,3 @@ HE16 is a proof-of-concept 16-key Hall-effect keyboard with 8kHz polling rate.
   - Hold **BOOT** button while plugging in the keyboard.
   - Press the `SP_BOOT` binding.
   - Use the web configurator.
-- **Dependencies**: [ArteryTek/platform-arterytekat32](https://github.com/ArteryTek/platform-arterytekat32)

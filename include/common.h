@@ -31,8 +31,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Load the configuration file before the rest of the headers
+#if defined(__has_include)
+#if __has_include("config.h")
+// Include additional configuration if available
 #include "config.h"
+#endif
+#endif
 
 #include "board_def.h"
 
@@ -53,14 +57,14 @@
 //--------------------------------------------------------------------+
 
 #if !defined(NUM_PROFILES)
-#define NUM_PROFILES 4
+#error "NUM_PROFILES is not defined"
 #endif
 
 _Static_assert(1 <= NUM_PROFILES && NUM_PROFILES <= 8,
                "NUM_PROFILES must be between 1 and 16");
 
 #if !defined(NUM_LAYERS)
-#define NUM_LAYERS 4
+#error "NUM_LAYERS is not defined"
 #endif
 
 _Static_assert(1 <= NUM_LAYERS && NUM_LAYERS <= 8,
@@ -74,8 +78,7 @@ _Static_assert(1 <= NUM_KEYS && NUM_KEYS <= 256,
                "NUM_KEYS must be between 1 and 256");
 
 #if !defined(NUM_ADVANCED_KEYS)
-// Maximum number of advanced keys
-#define NUM_ADVANCED_KEYS 32
+#error "NUM_ADVANCED_KEYS is not defined"
 #endif
 
 _Static_assert(1 <= NUM_ADVANCED_KEYS && NUM_ADVANCED_KEYS <= 64,

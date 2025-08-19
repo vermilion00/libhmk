@@ -1,0 +1,200 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "manufacturer": { "type": "string" },
+    "maintainer": { "type": "string" },
+    "usb": {
+      "type": "object",
+      "description": "USB configuration",
+      "properties": {
+        "vid": {
+          "type": "string",
+          "description": "USB Vendor ID",
+          "pattern": "^0x[0-9A-Fa-f]{4}$"
+        },
+        "pid": {
+          "type": "string",
+          "description": "USB Product ID",
+          "pattern": "^0x[0-9A-Fa-f]{4}$"
+        },
+        "port": {
+          "enum": ["fs", "hs"],
+          "description": "fs: Full Speed, hs: High Speed"
+        }
+      },
+      "required": ["vid", "pid", "port"]
+    },
+    "keyboard": {
+      "type": "object",
+      "description": "Keyboard configuration",
+      "properties": {
+        "num_profiles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "num_layers": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "num_keys": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "num_advanced_keys": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        }
+      },
+      "required": [
+        "num_profiles",
+        "num_layers",
+        "num_keys",
+        "num_advanced_keys"
+      ]
+    },
+    "hardware": {
+      "type": "object",
+      "description": "Hardware configuration",
+      "properties": {
+        "hse_value": {
+          "type": "integer",
+          "description": "High-speed external oscillator value in Hz"
+        },
+        "driver": {
+          "type": "string",
+          "description": "Keyboard driver name"
+        }
+      },
+      "required": ["hse_value", "driver"]
+    },
+    "analog": {
+      "type": "object",
+      "description": "Analog configuration",
+      "properties": {
+        "invert_adc": {
+          "type": "boolean",
+          "description": "Set to true if the ADC value is inversely proportional to the travel distance of the keys"
+        },
+        "delay": {
+          "type": "integer",
+          "description": "Delay in microseconds between ADC scans",
+          "minimum": 0
+        },
+        "raw": {
+          "type": "object",
+          "description": "Raw ADC input configuration",
+          "properties": {
+            "input": {
+              "type": "array",
+              "description": "Array of raw ADC input channels",
+              "items": { "type": "integer", "minimum": 0 }
+            },
+            "vector": {
+              "type": "array",
+              "description": "Array of key index mappings for the raw ADC inputs",
+              "items": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "required": ["input", "vector"]
+        },
+        "mux": {
+          "type": "object",
+          "description": "Analog multiplexer ADC input configuration",
+          "properties": {
+            "select": {
+              "type": "array",
+              "description": "Array of GPIO pin names for the multiplexer select lines",
+              "items": { "type": "string" }
+            },
+            "input": {
+              "type": "array",
+              "description": "Array of ADC input channels for the multiplexers",
+              "items": { "type": "integer", "minimum": 0 }
+            },
+            "matrix": {
+              "type": "array",
+              "description": "Mapping from multiplexers to ADC input channels",
+              "items": {
+                "type": "array",
+                "items": { "type": "integer", "minimum": 0 }
+              }
+            }
+          },
+          "required": ["select", "input", "matrix"]
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "description": "Calibration configuration",
+      "properties": {
+        "initial_rest_value": {
+          "type": "integer",
+          "description": "See `eeconfig.h`",
+          "minimum": 0
+        },
+        "initial_bottom_out_threshold": {
+          "type": "integer",
+          "description": "See `eeconfig.h`",
+          "minimum": 0
+        }
+      },
+      "required": ["initial_rest_value", "initial_bottom_out_threshold"]
+    },
+    "layout": {
+      "type": "array",
+      "description": "Metadata for how the keyboard should be rendered in the web configurator",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "integer", "minimum": 0 },
+            "w": { "type": "number", "minimum": 1 },
+            "h": { "type": "number", "minimum": 1 },
+            "x": { "type": "number" },
+            "y": { "type": "number" }
+          },
+          "required": ["key"]
+        }
+      }
+    },
+    "keymap": {
+      "type": "array",
+      "description": "Default keymap",
+      "items": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "actuation": {
+      "type": "object",
+      "description": "Actuation configuration",
+      "properties": {
+        "actuation_point": {
+          "type": "integer",
+          "description": "Default actuation point",
+          "minimum": 0,
+          "maximum": 255
+        }
+      }
+    }
+  },
+  "required": [
+    "name",
+    "manufacturer",
+    "maintainer",
+    "usb",
+    "keyboard",
+    "hardware",
+    "analog",
+    "calibration",
+    "layout",
+    "keymap"
+  ]
+}

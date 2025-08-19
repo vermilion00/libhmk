@@ -68,14 +68,8 @@ The development branch is `dev`, which contains the latest features and bug fixe
 
 To develop a new keyboard, create a new directory under `keyboards/` with your keyboard's name. This directory should include the following files:
 
-- `config.h`: Configuration header for your keyboard
-- `config.json`: A JSON file describing your keyboard's setup to be used by the `setup.py`. The file must contains the following keys:
-  - `driver`: The name of the keyboard driver, which is one of the drivers in the `hardware/` directory
-  - `board`: The name of the PlatformIO [board](https://docs.platformio.org/en/latest/boards/index.html).
-  - `ldscript`: The name of the linker script, which is one of the linker scripts in the `linker/` directory.
-  - `framework`: The name of the the PlatformIO [framework](https://docs.platformio.org/en/latest/frameworks/index.html).
-  - `platform`: The name of the PlatformIO [platform](https://docs.platformio.org/en/latest/platforms/index.html).
-- `metadata.json`: A JSON file containing metadata about your keyboard, for use by the web configurator.
+- `keyboard.json`: A JSON file containing metadata about your keyboard, used for both firmware compilation and the web configurator. Refer to [`scripts/schema/keyboard.schema.json`](scripts/schema/keyboard.schema.json) for the schema.
+- `config.h` (Optional): Additional configuration header for your keyboard to define custom configurations beyond what's specified in `keyboard.json`.
 
 You can use an existing keyboard implementation as a reference. If your keyboard hardware isn't currently supported by the firmware, you'll need to implement the necessary drivers and features. See the [Porting](#porting) section for more details.
 
@@ -91,7 +85,7 @@ The log messages will be sent to the HID interface, which can be viewed in [hid_
 
 Hardware drivers follow this directory structure:
 
-- [`hardware/`](hardware/): Contains hardware-specific header files
+- [`hardware/`](hardware/): Contains hardware-specific header files. Each subdirectory should also contain an `info.json` file that describes the PlatformIO configuration, TinyUSB configuration, and additional metadata. Refer to [`scripts/schema/driver.schema.json`](scripts/schema/driver.schema.json) for the schema.
 - [`include/hardware/`](include/hardware/): Contains hardware driver interface headers that declare functions to be implemented
 - [`src/hardware/`](src/hardware/): Contains hardware driver implementations of the functions declared in the header files
 - [`linker/`](linker/): Contains linker scripts for supported microcontrollers

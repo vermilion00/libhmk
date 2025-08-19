@@ -1,0 +1,14 @@
+{
+  "platformio": {
+    "board": "genericSTM32F446RE",
+    "ldscript": "stm32f446retx.ld",
+    "framework": "stm32cube",
+    "platform": "ststm32"
+  },
+  "tinyusb": {
+    "mcu": "stm32f4"
+  },
+  "metadata": {
+    "adc_bits": 12
+  }
+}

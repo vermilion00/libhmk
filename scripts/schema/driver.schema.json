@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "platformio": {
+      "type": "object",
+      "properties": {
+        "board": {
+          "type": "string",
+          "description": "The PlatformIO board identifier."
+        },
+        "ldscript": {
+          "type": "string",
+          "description": "The linker script used for the board."
+        },
+        "framework": {
+          "type": "string",
+          "description": "The PlatformIO framework identifier."
+        },
+        "platform": {
+          "type": "string",
+          "description": "The PlatformIO platform identifier."
+        }
+      },
+      "required": ["board", "ldscript", "framework", "platform"]
+    },
+    "tinyusb": {
+      "type": "object",
+      "properties": {
+        "mcu": {
+          "type": "string",
+          "description": "The MCU identifier for TinyUSB."
+        }
+      },
+      "required": ["mcu"]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about the driver.",
+      "properties": {
+        "adc_bits": {
+          "type": "integer",
+          "description": "The number of bits for the ADC resolution."
+        }
+      },
+      "required": ["adc_bits"]
+    }
+  }
+}

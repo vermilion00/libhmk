@@ -1,23 +1,15 @@
 import argparse
 import configparser
-import json
 import os
-
-
-def validate_config(config):
-    required_keys = ["driver", "board", "ldscript", "framework", "platform"]
-    for key in required_keys:
-        if key not in config:
-            raise ValueError(f"Missing required key: {key}")
-
-    if config["driver"] not in os.listdir("hardware"):
-        raise ValueError(f"Invalid driver: {config['driver']}")
-    if config["ldscript"] not in os.listdir("linker"):
-        raise ValueError(f"Invalid ldscript: {config['ldscript']}")
+import scripts.utils as utils
 
 
 if __name__ == "__main__":
-    keyboards = os.listdir("keyboards")
+    keyboards = [
+        keyboard
+        for keyboard in os.listdir("keyboards")
+        if os.path.isdir(os.path.join("keyboards", keyboard))
+    ]
 
     parser = argparse.ArgumentParser(description="PlatformIO Project Setup")
     parser.add_argument("--log", action="store_true", help="Enable logging")
@@ -27,27 +19,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     keyboard: str = args.keyboard
+    driver_json = utils.get_driver_json(keyboard)
 
-    config_path = os.path.join("keyboards", keyboard, "config.json")
-    if not os.path.exists(config_path):
-        raise FileNotFoundError(f"config.json not found for {keyboard}")
-    with open(config_path, "r") as f:
-        config = json.load(f)
-
-    validate_config(config)
-
-    build_flags = [
-        "${env.build_flags}",
-        # We prioritize including driver and keyboard headers.
-        f"-Ihardware/{config['driver']}/",
-        f"-Ikeyboards/{keyboard}/",
-        "-Iinclude/",
-    ]
-    build_src_filter = [
-        "${env.build_src_filter}",
-        "-<hardware/>",
-        f"+<hardware/{config['driver']}/>",
-    ]
+    build_flags = ["${env.build_flags}"]
     build_src_flags = [
         "${env.build_src_flags}",
         "-Werror",
@@ -60,25 +34,29 @@ if __name__ == "__main__":
         "-Wstrict-prototypes",
         "-Wno-unused-parameter",
     ]
-    extra_scripts = ["pre:tools/metadata.py"]
+    extra_scripts = [
+        "pre:scripts/get_deps.py",
+        "pre:scripts/make.py",
+        "pre:scripts/metadata.py",
+    ]
     lib_deps = ["https://github.com/hathach/tinyusb.git"]
 
     if args.log:
         # Enable logging module
         lib_deps.append("https://github.com/eyalroz/printf.git#develop")
-        build_src_flags.append("-DLOG_ENABLED")
+        build_flags.append("-DLOG_ENABLED")
 
     pio_config = configparser.ConfigParser()
     pio_config[f"env:{keyboard}"] = {
-        "board": config["board"],
-        "board_build.ldscript": f"linker/{config['ldscript']}",
+        "board": driver_json["platformio"]["board"],
+        "board_build.ldscript": f"linker/{driver_json['platformio']['ldscript']}",
         "build_flags": "\n".join(build_flags),
-        "build_src_filter": "\n".join(build_src_filter),
+        "build_src_filter": "${env.build_src_filter}",
         "build_src_flags": "\n".join(build_src_flags),
         "extra_scripts": "\n".join(extra_scripts),
-        "framework": config["framework"],
+        "framework": driver_json["platformio"]["framework"],
         "lib_deps": "\n".join(lib_deps),
-        "platform": config["platform"],
+        "platform": driver_json["platformio"]["platform"],
         "upload_protocol": "dfu",
     }
 

@@ -13,7 +13,6 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "analog.h"
 #include "hardware/hardware.h"
 
 #include "at32f402_405.h"

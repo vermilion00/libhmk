@@ -1,7 +1,0 @@
-{
-  "driver": "at32f405xx",
-  "ldscript": "at32f405rctx.ld",
-  "board": "genericAT32F405RCT7",
-  "framework": "at32firmlib",
-  "platform": "arterytekat32"
-}

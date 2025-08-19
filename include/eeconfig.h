@@ -115,10 +115,7 @@ extern const eeconfig_t *eeconfig;
 #endif
 
 #if !defined(DEFAULT_KEYMAP)
-// Default keymap
-#define DEFAULT_KEYMAP                                                         \
-  {                                                                            \
-  }
+#error "DEFAULT_KEYMAP is not defined"
 #endif
 
 #if !defined(DEFAULT_ACTUATION_POINT)

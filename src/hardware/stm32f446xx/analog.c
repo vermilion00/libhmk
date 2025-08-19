@@ -13,7 +13,6 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "analog.h"
 #include "hardware/hardware.h"
 
 #include "stm32f4xx_hal.h"

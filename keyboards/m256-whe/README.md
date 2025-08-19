@@ -8,4 +8,3 @@ M256-WHE is a 65% Hall-effect keyboard, built for Mode SixtyFive (2024), Mode En
   - Hold **BOOT** button while plugging in the keyboard.
   - Press the `SP_BOOT` binding.
   - Use the web configurator.
-- **Dependencies**: None

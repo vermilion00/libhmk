@@ -8,4 +8,3 @@ HE60 is a Tsangan layout 60% Hall-effect keyboard.
   - Hold **BOOT** button while plugging in the keyboard.
   - Press the `SP_BOOT` binding.
   - Use the web configurator.
-- **Dependencies**: None

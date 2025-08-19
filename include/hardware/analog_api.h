@@ -18,6 +18,65 @@
 #include "common.h"
 
 //--------------------------------------------------------------------+
+// Analog Configuration
+//--------------------------------------------------------------------+
+
+#if !defined(ADC_NUM_MUX_INPUTS)
+// Number of ADC inputs that are connected to the multiplexer
+#define ADC_NUM_MUX_INPUTS 0
+#endif
+
+#if ADC_NUM_MUX_INPUTS > 0
+#if !defined(ADC_MUX_INPUT_CHANNELS)
+#error "ADC_MUX_INPUT_CHANNELS is not defined"
+#endif
+
+#if !defined(ADC_NUM_MUX_SELECT_PINS)
+#error "ADC_NUM_MUX_SELECT_PINS is not defined"
+#endif
+
+#if !defined(ADC_MUX_SELECT_PORTS)
+#error "ADC_MUX_SELECT_PORTS is not defined"
+#endif
+
+#if !defined(ADC_MUX_SELECT_PINS)
+#error "ADC_MUX_SELECT_PINS is not defined"
+#endif
+
+#if !defined(ADC_MUX_INPUT_MATRIX)
+#error "ADC_MUX_INPUT_MATRIX is not defined"
+#endif
+
+#if !defined(ADC_SAMPLE_DELAY)
+// Delay in microseconds to allow the multiplexer outputs to settle
+#define ADC_SAMPLE_DELAY 20
+#endif
+
+_Static_assert((F_CPU / 1000000) * ADC_SAMPLE_DELAY < 65536,
+               "ADC_SAMPLE_DELAY exceeds maximum timer period");
+#endif
+
+#if !defined(ADC_NUM_RAW_INPUTS)
+// Number of ADC inputs that are connected directly to the keys
+#define ADC_NUM_RAW_INPUTS 0
+#endif
+
+#if ADC_NUM_RAW_INPUTS > 0
+#if !defined(ADC_RAW_INPUT_CHANNELS)
+#error "ADC_RAW_INPUT_CHANNELS is not defined"
+#endif
+
+#if !defined(ADC_RAW_INPUT_VECTOR)
+#error "ADC_RAW_INPUT_VECTOR is not defined"
+#endif
+#endif
+
+#if !(0 < (ADC_NUM_MUX_INPUTS + ADC_NUM_RAW_INPUTS) &&                         \
+      (ADC_NUM_MUX_INPUTS + ADC_NUM_RAW_INPUTS) <= ADC_NUM_CHANNELS)
+#error "Invalid number of ADC inputs"
+#endif
+
+//--------------------------------------------------------------------+
 // Analog API
 //--------------------------------------------------------------------+
 

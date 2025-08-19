@@ -1,0 +1,14 @@
+{
+  "platformio": {
+    "board": "genericAT32F405RCT7",
+    "ldscript": "at32f405xc.ld",
+    "framework": "at32firmlib",
+    "platform": "https://github.com/ArteryTek/platform-arterytekat32.git"
+  },
+  "tinyusb": {
+    "mcu": "at32f402_405"
+  },
+  "metadata": {
+    "adc_bits": 12
+  }
+}
