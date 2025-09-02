@@ -15,9 +15,7 @@
 
 #include "eeconfig.h"
 
-#include "advanced_keys.h"
 #include "keycodes.h"
-#include "layout.h"
 #include "migration.h"
 
 const eeconfig_t *eeconfig;
@@ -55,8 +53,9 @@ void eeconfig_init(void) {
   } while (0)
 
 bool eeconfig_reset(void) {
+  // We must not perform any action here that requires reading from
+  // the configuration as it may be in an invalid state.
   bool status = true;
-  advanced_key_clear();
   EECONFIG_WRITE_LOCAL(magic_start, EECONFIG_MAGIC_START);
   EECONFIG_WRITE_LOCAL(version, EECONFIG_VERSION);
   status &= EECONFIG_WRITE(calibration, &default_calibration);
@@ -66,7 +65,6 @@ bool eeconfig_reset(void) {
   for (uint32_t i = 0; i < NUM_PROFILES; i++)
     status &= EECONFIG_WRITE(profiles[i], &default_profile);
   EECONFIG_WRITE_LOCAL(magic_end, EECONFIG_MAGIC_END);
-  layout_load_advanced_keys();
 
   return status;
 }
@@ -77,11 +75,5 @@ bool eeconfig_reset_profile(uint8_t profile) {
   if (profile >= NUM_PROFILES)
     return false;
 
-  if (eeconfig->current_profile == profile)
-    advanced_key_clear();
-  const bool status = EECONFIG_WRITE(profiles[profile], &default_profile);
-  if (eeconfig->current_profile == profile)
-    layout_load_advanced_keys();
-
-  return status;
+  return EECONFIG_WRITE(profiles[profile], &default_profile);
 }

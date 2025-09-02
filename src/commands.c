@@ -52,7 +52,9 @@ void command_process(const uint8_t *buf) {
     break;
   }
   case COMMAND_FACTORY_RESET: {
+    advanced_key_clear();
     success = eeconfig_reset();
+    layout_load_advanced_keys();
     break;
   }
   case COMMAND_RECALIBRATE: {
@@ -97,7 +99,11 @@ void command_process(const uint8_t *buf) {
 
     COMMAND_VERIFY(p->profile < NUM_PROFILES);
 
+    if (p->profile == eeconfig->current_profile)
+      advanced_key_clear();
     success = eeconfig_reset_profile(p->profile);
+    if (p->profile == eeconfig->current_profile)
+      layout_load_advanced_keys();
     break;
   }
   case COMMAND_DUPLICATE_PROFILE: {
