@@ -64,7 +64,7 @@ static void board_usb_init(void) {
   GPIO_InitTypeDef gpio_init = {0};
 
   rcc_periph_clk_init.PeriphClockSelection = RCC_PERIPHCLK_CLK48;
-  rcc_periph_clk_init.PLLSAI.PLLSAIM = 16;
+  rcc_periph_clk_init.PLLSAI.PLLSAIM = BOARD_HSE_VALUE / 1000000;
   rcc_periph_clk_init.PLLSAI.PLLSAIN = 192;
   rcc_periph_clk_init.PLLSAI.PLLSAIQ = 2;
   rcc_periph_clk_init.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV4;
