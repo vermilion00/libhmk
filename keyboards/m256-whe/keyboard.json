@@ -18,7 +18,6 @@
     "driver": "stm32f446xx"
   },
   "analog": {
-    "invert_adc": true,
     "mux": {
       "select": ["C13", "C14", "C15"],
       "input": [3, 4, 2, 5, 1, 6, 0, 7, 8],
@@ -37,7 +36,7 @@
   },
   "calibration": {
     "initial_rest_value": 2300,
-    "initial_bottom_out_threshold": 650
+    "initial_bottom_out_threshold": 600
   },
   "layout": [
     [
