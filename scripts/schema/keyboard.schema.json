@@ -91,8 +91,8 @@
           "properties": {
             "input": {
               "type": "array",
-              "description": "Array of raw ADC input channels",
-              "items": { "type": "integer", "minimum": 0 }
+              "description": "Array of raw ADC input channels. If a string is provided, it is used as the GPIO pin name",
+              "items": { "type": ["integer", "string"], "minimum": 0 }
             },
             "vector": {
               "type": "array",
@@ -113,8 +113,8 @@
             },
             "input": {
               "type": "array",
-              "description": "Array of ADC input channels for the multiplexers",
-              "items": { "type": "integer", "minimum": 0 }
+              "description": "Array of ADC input channels for the multiplexers. If a string is provided, it is used as the GPIO pin name",
+              "items": { "type": ["integer", "string"], "minimum": 0 }
             },
             "matrix": {
               "type": "array",

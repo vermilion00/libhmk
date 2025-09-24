@@ -91,3 +91,18 @@ def to_gpio_array(pins: list[str], driver: str):
     else:
         raise ValueError(f"Unsupported driver: {driver}")
     return (ports, pin_nums)
+
+
+def to_adc_input_array(channels_or_pins: list[str | int], driver_json: dict):
+    """
+    Convert a list of ADC input channels or GPIO pin names to a C array of ADC input channels
+    """
+    adc_input_pins = driver_json["metadata"]["adc_input_pins"]
+    channels = []
+    for x in channels_or_pins:
+        if isinstance(x, str):
+            channels.append(adc_input_pins.index(x))
+        else:
+            assert x < len(adc_input_pins)
+            channels.append(x)
+    return to_c_array(channels)

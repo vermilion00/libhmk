@@ -40,9 +40,14 @@
         "adc_bits": {
           "type": "integer",
           "description": "The number of bits for the ADC resolution."
+        },
+        "adc_input_pins": {
+          "type": "array",
+          "description": "An array of ADC input pin names, sorted by ADC channel index.",
+          "items": { "type": "string" }
         }
       },
-      "required": ["adc_bits"]
+      "required": ["adc_bits", "adc_input_pins"]
     }
   }
 }

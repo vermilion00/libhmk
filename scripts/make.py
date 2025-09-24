@@ -61,7 +61,9 @@ if "raw" in kb_json["analog"]:
     raw = kb_json["analog"]["raw"]
 
     build_flags.define("ADC_NUM_RAW_INPUTS", len(raw["input"]))
-    build_flags.define("ADC_RAW_INPUT_CHANNELS", utils.to_c_array(raw["input"]))
+    build_flags.define(
+        "ADC_RAW_INPUT_CHANNELS", utils.to_adc_input_array(raw["input"], driver_json)
+    )
     build_flags.define("ADC_RAW_INPUT_VECTOR", utils.to_c_array(raw["vector"]))
 
 # Analog Multiplexer ADC Input Configuration
@@ -69,7 +71,9 @@ if "mux" in kb_json["analog"]:
     mux = kb_json["analog"]["mux"]
 
     build_flags.define("ADC_NUM_MUX_INPUTS", len(mux["input"]))
-    build_flags.define("ADC_MUX_INPUT_CHANNELS", utils.to_c_array(mux["input"]))
+    build_flags.define(
+        "ADC_MUX_INPUT_CHANNELS", utils.to_adc_input_array(mux["input"], driver_json)
+    )
     build_flags.define("ADC_NUM_MUX_SELECT_PINS", len(mux["select"]))
 
     ports, pin_nums = utils.to_gpio_array(mux["select"], driver)
