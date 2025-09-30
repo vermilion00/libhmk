@@ -85,7 +85,7 @@ def to_gpio_array(pins: list[str], driver: str):
     if driver == "stm32f446xx":
         ports = [f"GPIO{pin[0]}" for pin in pins]
         pin_nums = [f"GPIO_PIN_{pin[1:]}" for pin in pins]
-    elif driver == "at32f405xx":
+    elif driver == "at32f405xx" or "at32f403axx":
         ports = [f"GPIO{pin[0]}" for pin in pins]
         pin_nums = [f"GPIO_PINS_{pin[1:]}" for pin in pins]
     else:
