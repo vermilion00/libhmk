@@ -5,3 +5,7 @@ __pycache__/
 
 # Metadata header file
 include/metadata.h
+
+.gitignore
+keyboards/
+notes.txt
