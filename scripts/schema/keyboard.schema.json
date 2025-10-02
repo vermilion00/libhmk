@@ -72,6 +72,37 @@
       },
       "required": ["hse_value", "driver"]
     },
+    "split_keyboard": {
+      "type": "object",
+      "description": "Split keyboard configuration",
+      "properties": {
+        "transport_method": {
+          "type": "string",
+          "description": "The communication method between the two controllers",
+          "enum": ["usart"]
+        },
+        "master_half": {
+          "type": "string",
+          "description": "Which half of the keyboard is the master",
+          "enum": ["left", "right", "usb_detect"]
+        },
+        "half_detection_method": {
+          "type": "string",
+          "description": "The method that's used to detect which half of the keyboard this controller is",
+          "enum": ["pin", "flash"]
+        },
+        "detection_pin": {
+          "type": "string",
+          "description": "The pin that is read to determine the keyboard half. A low value at this pin means it is the left half."
+        },
+        "pin_high_is_left": {
+          "type": "boolean",
+          "description": "If true, a high value on the detection pin will set that half to be the left side instead.",
+          "default": false
+        }
+      },
+      "required": ["transport_method", "half_detection_method", "master_half"]
+    },
     "analog": {
       "type": "object",
       "description": "Analog configuration",

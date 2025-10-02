@@ -105,5 +105,17 @@ if "actuation" in kb_json:
     if "actuation_point" in actuation:
         build_flags.define("ACTUATION_POINT", actuation["actuation_point"])
 
+#Split keyboard configuration
+if "split_keyboard" in kb_json:
+    build_flags.define("SPLIT_KEYBOARD")
+    build_flags.define("SPLIT_TRANSPORT_METHOD", f"SPLIT_TRANSPORT_{kb_json['split_keyboard']['transport_method'].upper()}")
+    build_flags.define("SPLIT_MASTER_HALF", kb_json['split_keyboard']['master_half'])
+    detection_method = kb_json['split_keyboard']['half_detection_method']
+    build_flags.define("SPLIT_DETECTION_METHOD", detection_method)
+    if detection_method == "pin":
+        build_flags.define("SPLIT_DETECTION_PIN", kb_json['split_keyboard']['detection_pin'])
+        if kb_json['split_keyboard']['pin_high_is_left'] == True:
+            build_flags.define("SPLIT_PIN_HIGH_IS_LEFT")
+
 # Add source build flags
 env.Append(BUILD_FLAGS=build_flags.get_flags())

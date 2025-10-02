@@ -18,11 +18,12 @@
 #include "common.h"
 
 //--------------------------------------------------------------------+
-// Hardware Headers
+// Split API
 //--------------------------------------------------------------------+
 
-#include "hardware/analog_api.h"
-#include "hardware/board_api.h"
-#include "hardware/flash_api.h"
-#include "hardware/timer_api.h"
-#include "hardware/split_api.h"
+/**
+ * @brief Initialize the split driver
+ *
+ * @return None
+ */
+void split_init(void);
