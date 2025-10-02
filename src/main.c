@@ -26,6 +26,7 @@
 #include "tusb.h"
 #include "wear_leveling.h"
 #include "xinput.h"
+#include "split.h"
 
 int main(void) {
 #if defined(LOG_ENABLED)
@@ -41,6 +42,11 @@ int main(void) {
   // Initialize the persistent configuration
   wear_leveling_init();
   eeconfig_init();
+
+  // Initialize split communication (if enabled)
+  #if defined(SPLIT_KEYBOARD)
+  split_init();
+  #endif
 
   // Initialize the core modules
   analog_init();

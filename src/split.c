@@ -13,26 +13,7 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "hardware/hardware.h"
 
-#include "common.h"
+#include "stm32f4xx_hal.h"
 
-#if defined(SPLIT_DRIVER_USART)
-#include "usart.h"
-#elif defined(SPLIT_DRIVER_I2C)
-#error "I2C is not supported yet"
-#include "i2c.h"
-#else
-#error "Split driver is not defined!"
-#endif
-
-//--------------------------------------------------------------------+
-// Split API
-//--------------------------------------------------------------------+
-
-/**
- * @brief Initialize the split driver
- *
- * @return None
- */
-void split_init(void);

@@ -22,15 +22,19 @@ kb_json = utils.get_kb_json(keyboard)
 driver_json = utils.get_driver_json(keyboard)
 driver = kb_json["hardware"]["driver"]
 
-# Add source filter for driver source files
-env.Append(SRC_FILTER=["-<hardware/>", f"+<hardware/{driver}/>"])
-
 # Build Flags
 build_flags = utils.CompilerFlags()
 
-# Include headers. We prioritize including driver and keyboard headers.
+# Add source filter for driver source files
+env.Append(SRC_FILTER=["-<hardware/>", f"+<hardware/{driver}/>"])
+
+
+# Include headers. We prioritize including driver, keyboard and split headers.
 build_flags.include(f"hardware/{driver}")
 build_flags.include(f"keyboards/{keyboard}")
+if "split_keyboard" in kb_json:
+    split_driver = kb_json["split_keyboard"]["driver"]
+    build_flags.include(f"include/{split_driver}")
 build_flags.include("include")
 
 # TinyUSB Configuration
@@ -108,14 +112,15 @@ if "actuation" in kb_json:
 #Split keyboard configuration
 if "split_keyboard" in kb_json:
     build_flags.define("SPLIT_KEYBOARD")
-    build_flags.define("SPLIT_TRANSPORT_METHOD", f"SPLIT_TRANSPORT_{kb_json['split_keyboard']['transport_method'].upper()}")
-    build_flags.define("SPLIT_MASTER_HALF", kb_json['split_keyboard']['master_half'])
+    build_flags.define(f"SPLIT_DRIVER_{split_driver.upper()}")
     detection_method = kb_json['split_keyboard']['half_detection_method']
     build_flags.define("SPLIT_DETECTION_METHOD", detection_method)
     if detection_method == "pin":
         build_flags.define("SPLIT_DETECTION_PIN", kb_json['split_keyboard']['detection_pin'])
         if kb_json['split_keyboard']['pin_high_is_left'] == True:
             build_flags.define("SPLIT_PIN_HIGH_IS_LEFT")
+    elif detection_method == "master":
+        build_flags.define(f"SPLIT_MASTER_{kb_json['split_keyboard']['master_half'].upper()}")
 
 # Add source build flags
 env.Append(BUILD_FLAGS=build_flags.get_flags())
